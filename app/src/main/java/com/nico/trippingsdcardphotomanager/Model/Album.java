@@ -50,6 +50,20 @@ public class Album {
         currentPosition = 0;
     }
 
+    public void moveForward() {
+        advance(1);
+    }
+
+    public void moveBackwards() {
+        advance(-1);
+    }
+
+    private void advance(int i) {
+        currentPosition += i;
+        if (currentPosition >= picturePaths.size()) currentPosition = 0;
+        if (currentPosition < 0) currentPosition = picturePaths.size() - 1;
+    }
+
     public Picture getCurrentPicture() {
         return new Picture(path, picturePaths.get(currentPosition));
     }
