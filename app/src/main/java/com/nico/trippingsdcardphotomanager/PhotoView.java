@@ -48,16 +48,21 @@ public class PhotoView extends ActionBarActivity implements GestureDetector.OnGe
     }
 
     private void displayCurrentPicture() {
+        TextView picIdx = (TextView) findViewById(R.id.wPictureIndex);
+        final String idxMsg = getResources().getString(R.string.status_picture_index);
+        picIdx.setText(String.format(idxMsg, album.getCurrentPosition(), album.getSize()));
+        picIdx.setVisibility(View.VISIBLE);
+
         final ImageView wImg = (ImageView) findViewById(R.id.wCurrentImage);
         final TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
         final Picture pic = album.getCurrentPicture();
-
         try {
             wImg.setImageBitmap(pic.toBitmap());
             status.setText(pic.getFileName());
             Log.i(PhotoView.class.getName(), "Loaded " + pic.getFileName());
         } catch (Picture.InvalidImage invalidImage) {
-            status.setText(pic.getFileName() + ": " + R.string.status_invalid_picture);
+            final String msg = getResources().getString(R.string.status_invalid_picture);
+            status.setText(String.format(msg, pic.getFileName()));
             Log.i(PhotoView.class.getName(), "Couldn't render image " + pic.getFileName());
         }
     }
@@ -68,6 +73,9 @@ public class PhotoView extends ActionBarActivity implements GestureDetector.OnGe
 
         TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
         status.setText(R.string.status_album_is_empty);
+
+        TextView picIdx = (TextView) findViewById(R.id.wPictureIndex);
+        picIdx.setVisibility(View.INVISIBLE);
     }
 
     @Override

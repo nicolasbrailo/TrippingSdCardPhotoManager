@@ -46,6 +46,14 @@ public class Album {
         return true;
     }
 
+    public int getSize() {
+        return picturePaths.size();
+    }
+
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
     public void resetPosition() {
         currentPosition = 0;
     }

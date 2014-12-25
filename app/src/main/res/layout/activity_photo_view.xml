@@ -28,6 +28,17 @@
         android:layout_centerInParent="true"
         android:gravity="center_vertical|center_horizontal" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Picture Index"
+        android:id="@+id/wPictureIndex"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:visibility="invisible" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
