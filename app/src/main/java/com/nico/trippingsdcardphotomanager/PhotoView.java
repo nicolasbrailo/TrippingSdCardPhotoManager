@@ -8,9 +8,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
+import com.nico.trippingsdcardphotomanager.Model.Picture;
 
 
 public class PhotoView extends ActionBarActivity {
@@ -31,9 +33,23 @@ public class PhotoView extends ActionBarActivity {
             disablePhotoViewer();
         } else {
             Log.i(PhotoView.class.getName(), "Opening album " + path);
+            album.resetPosition();
+            displayCurrentPicture();
+        }
+    }
 
-            TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
-            status.setText("Yaaay!");
+    private void displayCurrentPicture() {
+        final ImageView wImg = (ImageView) findViewById(R.id.wCurrentImage);
+        final TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
+        final Picture pic = album.getCurrentPicture();
+
+        try {
+            wImg.setImageBitmap(pic.toBitmap());
+            status.setText(pic.getFileName());
+            Log.i(PhotoView.class.getName(), "Loaded " + pic.getFileName());
+        } catch (Picture.InvalidImage invalidImage) {
+            status.setText(pic.getFileName() + ": " + R.string.status_invalid_picture);
+            Log.i(PhotoView.class.getName(), "Couldn't render image " + pic.getFileName());
         }
     }
 

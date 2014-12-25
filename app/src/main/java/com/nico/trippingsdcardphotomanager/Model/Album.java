@@ -7,6 +7,7 @@ import java.util.List;
 public class Album {
     private final String path;
     private List<String> picturePaths;
+    private int currentPosition = 0;
 
     public Album(final String path) {
         this.path = path;
@@ -43,5 +44,13 @@ public class Album {
     private boolean isPicture(File fp) {
         // TODO
         return true;
+    }
+
+    public void resetPosition() {
+        currentPosition = 0;
+    }
+
+    public Picture getCurrentPicture() {
+        return new Picture(path, picturePaths.get(currentPosition));
     }
 }

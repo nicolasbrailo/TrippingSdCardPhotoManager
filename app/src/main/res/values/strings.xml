@@ -8,5 +8,6 @@
     <string name="title_activity_photo_view">PhotoView</string>
     <string name="select_new_path">Choose new album</string>
     <string name="status_album_is_empty">This album is empty, choose a new one.</string>
+    <string name="status_invalid_picture">not a valid picture</string>
 
 </resources>
