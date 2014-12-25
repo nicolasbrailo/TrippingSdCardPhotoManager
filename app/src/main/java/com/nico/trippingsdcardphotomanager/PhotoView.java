@@ -1,20 +1,49 @@
 package com.nico.trippingsdcardphotomanager;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import com.nico.trippingsdcardphotomanager.Model.Album;
 
 
 public class PhotoView extends ActionBarActivity {
     public static final String ACTIVITY_PARAM_SELECTED_PATH = "com.nico.trippingsdcardphotomanager.ALBUM_PATH";
 
+    Album album;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_view);
+
+        String path = getIntent().getStringExtra(ACTIVITY_PARAM_SELECTED_PATH);
+        album = new Album(path);
+
+        if (album.isEmpty()) {
+            Log.i(PhotoView.class.getName(), "Received empty album " + path);
+            disablePhotoViewer();
+        } else {
+            Log.i(PhotoView.class.getName(), "Opening album " + path);
+
+            TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
+            status.setText("Yaaay!");
+        }
     }
 
+    private void disablePhotoViewer() {
+        final Button newDir = (Button) findViewById(R.id.wEmptyAlbum_SelectNewDir);
+        newDir.setVisibility(View.VISIBLE);
+
+        TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
+        status.setText(R.string.status_album_is_empty);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -36,5 +65,9 @@ public class PhotoView extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onSelectNewDir(View view) {
+        startActivity(new Intent(this, DirSelect.class));
     }
 }
