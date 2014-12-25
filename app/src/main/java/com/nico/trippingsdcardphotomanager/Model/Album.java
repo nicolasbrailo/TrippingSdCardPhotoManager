@@ -1,15 +1,19 @@
 package com.nico.trippingsdcardphotomanager.Model;
 
+import android.view.WindowManager;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Album {
     private final String path;
+    private final WindowManager windowManager;
     private List<String> picturePaths;
     private int currentPosition = 0;
 
-    public Album(final String path) {
+    public Album(WindowManager windowManager, final String path) {
+        this.windowManager = windowManager;
         this.path = path;
         this.picturePaths = readAlbumPictures(path);
     }
@@ -73,6 +77,6 @@ public class Album {
     }
 
     public Picture getCurrentPicture() {
-        return new Picture(path, picturePaths.get(currentPosition));
+        return new Picture(windowManager, path, picturePaths.get(currentPosition));
     }
 }

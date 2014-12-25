@@ -1,5 +1,6 @@
 package com.nico.trippingsdcardphotomanager;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -12,13 +13,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.Picture;
+import com.nico.trippingsdcardphotomanager.Services.PictureResizer;
 
 
-public class PhotoView extends ActionBarActivity implements GestureDetector.OnGestureListener {
+public class PhotoView extends Activity implements
+                        GestureDetector.OnGestureListener,
+                        PictureResizer.PictureReadyCallback {
     public static final String ACTIVITY_PARAM_SELECTED_PATH = "com.nico.trippingsdcardphotomanager.ALBUM_PATH";
     private static final float SWIPE_THRESHOLD_VELOCITY = 100;
 
@@ -32,7 +37,7 @@ public class PhotoView extends ActionBarActivity implements GestureDetector.OnGe
         mDetector = new GestureDetectorCompat(this, this);
 
         String path = getIntent().getStringExtra(ACTIVITY_PARAM_SELECTED_PATH);
-        album = new Album(path);
+        album = new Album(getWindowManager(), path);
         if (album.isEmpty()) {
             Log.i(PhotoView.class.getName(), "Received empty album " + path);
             disablePhotoViewer();
@@ -47,24 +52,40 @@ public class PhotoView extends ActionBarActivity implements GestureDetector.OnGe
         startActivity(new Intent(this, DirSelect.class));
     }
 
-    private void displayCurrentPicture() {
-        TextView picIdx = (TextView) findViewById(R.id.wPictureIndex);
-        final String idxMsg = getResources().getString(R.string.status_picture_index);
-        picIdx.setText(String.format(idxMsg, album.getCurrentPosition(), album.getSize()));
-        picIdx.setVisibility(View.VISIBLE);
-
+    @Override
+    public void onPictureLoaded(Picture pic) {
         final ImageView wImg = (ImageView) findViewById(R.id.wCurrentImage);
         final TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
-        final Picture pic = album.getCurrentPicture();
         try {
-            wImg.setImageBitmap(pic.toBitmap());
+            wImg.setImageBitmap(pic.getBitmap());
             status.setText(pic.getFileName());
             Log.i(PhotoView.class.getName(), "Loaded " + pic.getFileName());
         } catch (Picture.InvalidImage invalidImage) {
             final String msg = getResources().getString(R.string.status_invalid_picture);
             status.setText(String.format(msg, pic.getFileName()));
             Log.i(PhotoView.class.getName(), "Couldn't render image " + pic.getFileName());
+        } catch (Picture.MustResizePictureFirst ex) {
+            final String msg = getResources().getString(R.string.status_programmer_error);
+            status.setText(String.format(msg, pic.getFileName(), ex.getMessage()));
+            Log.i(PhotoView.class.getName(), "Programmer error when loading " + pic.getFileName() +
+                                             ": " + ex.getMessage());
         }
+
+        findViewById(R.id.wCurrentImage).setVisibility(View.VISIBLE);
+        findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
+    }
+
+    private void displayCurrentPicture() {
+        findViewById(R.id.wCurrentImageLoading).setVisibility(View.VISIBLE);
+        findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
+
+        PictureResizer imgLoader = new PictureResizer(this);
+        imgLoader.execute(album.getCurrentPicture());
+
+        TextView picIdx = (TextView) findViewById(R.id.wPictureIndex);
+        final String idxMsg = getResources().getString(R.string.status_picture_index);
+        picIdx.setText(String.format(idxMsg, album.getCurrentPosition(), album.getSize()));
+        picIdx.setVisibility(View.VISIBLE);
     }
 
     private void disablePhotoViewer() {
@@ -76,28 +97,6 @@ public class PhotoView extends ActionBarActivity implements GestureDetector.OnGe
 
         TextView picIdx = (TextView) findViewById(R.id.wPictureIndex);
         picIdx.setVisibility(View.INVISIBLE);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_photo_view, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**********************************************************************************************/
@@ -128,5 +127,4 @@ public class PhotoView extends ActionBarActivity implements GestureDetector.OnGe
     @Override public boolean onSingleTapUp(MotionEvent e) { return false; }
     @Override public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) { return false; }
     @Override public void onLongPress(MotionEvent e) { }
-
 }

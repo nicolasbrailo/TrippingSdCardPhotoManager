@@ -22,6 +22,7 @@
             android:name=".PhotoView"
             android:label="@string/title_activity_photo_view" >
         </activity>
+
     </application>
 
 </manifest>

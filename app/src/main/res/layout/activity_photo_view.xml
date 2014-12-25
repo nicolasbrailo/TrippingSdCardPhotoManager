@@ -17,6 +17,13 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
+    <ProgressBar
+        android:id="@+id/wCurrentImageLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/wEmptyAlbum_SelectNewDir"
+        android:layout_centerHorizontal="true" />
+
     <TextView android:text="@string/loading" android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/wCurrentStatusText"
@@ -47,6 +54,6 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:onClick="onSelectNewDir"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 
 </RelativeLayout>
