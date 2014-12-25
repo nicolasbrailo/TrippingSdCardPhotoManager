@@ -54,6 +54,9 @@ public class PhotoView extends Activity implements
 
     @Override
     public void onPictureLoaded(Picture pic) {
+        // TODO: If the user tries to display a new picture while the current one is loading
+        // we should cancel (or ignore) what's currently being resized
+
         final ImageView wImg = (ImageView) findViewById(R.id.wCurrentImage);
         final TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
         try {
