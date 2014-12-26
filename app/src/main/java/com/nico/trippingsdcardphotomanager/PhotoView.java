@@ -6,11 +6,14 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.Picture;
@@ -20,18 +23,22 @@ import com.nico.trippingsdcardphotomanager.Services.PictureResizer;
 
 public class PhotoView extends Activity implements
                         GestureDetector.OnGestureListener,
+                        PopupMenu.OnMenuItemClickListener,
                         PictureResizer.PictureReadyCallback {
+
     public static final String ACTIVITY_PARAM_SELECTED_PATH = "com.nico.trippingsdcardphotomanager.ALBUM_PATH";
     private static final float SWIPE_THRESHOLD_VELOCITY = 100;
 
     Album album;
     private GestureDetectorCompat mDetector;
     private boolean loadingPicture = false;
+    private boolean reviewMarkedForDeletion = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_view);
+
         mDetector = new GestureDetectorCompat(this, this);
 
         String path = getIntent().getStringExtra(ACTIVITY_PARAM_SELECTED_PATH);
@@ -53,6 +60,23 @@ public class PhotoView extends Activity implements
     private void displayCurrentPicture() {
         // Avoid loading a picture while processing another one
         if (loadingPicture) return;
+
+        if (reviewMarkedForDeletion) {
+            // Skip pics not marked for deletion
+            int startPos = album.getCurrentPosition();
+            while (!album.getCurrentPicture().isMarkedForDeletion())
+            {
+                // If this is the last pic, remind the user how to confirm deletion
+                if (album.getCurrentPosition() == (album.getSize()-1)) {
+                    CharSequence msg = getResources().getString(R.string.status_reviewing_marked_for_delete);
+                    Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
+                    toast.show();
+                }
+
+                // TODO: Break if we looped all around and there are no imgs to delete
+                album.moveForward();
+            }
+        }
 
         findViewById(R.id.wCurrentImageLoading).setVisibility(View.VISIBLE);
         findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
@@ -126,6 +150,43 @@ public class PhotoView extends Activity implements
     public void onMarkForDelete(View view) {
         album.getCurrentPicture().toggleDeletionFlag();
         displayMarkForDeleteBtn(album.getCurrentPicture());
+    }
+
+    /**********************************************************************************************/
+    /* Menu handling */
+    /**********************************************************************************************/
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.review_images_marked_for_deletion:
+                reviewMarkedForDeletion = true;
+                album.resetPosition();
+                displayCurrentPicture();
+
+                CharSequence msg = getResources().getString(R.string.status_reviewing_marked_for_delete);
+                Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
+                toast.show();
+                return true;
+            case R.id.confirm_images_deletion:
+                // TODO
+                CharSequence msg2 = "Not implemented yet";
+                Toast toast2 = Toast.makeText(getApplicationContext(), msg2, Toast.LENGTH_LONG);
+                toast2.show();
+                return true;
+            case R.id.choose_another_album:
+                startActivity(new Intent(this, DirSelect.class));
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public void onOpenMenuClicked(View view) {
+        PopupMenu menu = new PopupMenu(this, view);
+        menu.getMenuInflater().inflate(R.menu.menu_photo_view, menu.getMenu());
+        menu.setOnMenuItemClickListener(this);
+        menu.show();
     }
 
     /**********************************************************************************************/

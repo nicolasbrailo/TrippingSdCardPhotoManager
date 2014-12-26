@@ -2,6 +2,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.nico.trippingsdcardphotomanager.PhotoView">
+
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
+
+    <item android:id="@+id/review_images_marked_for_deletion"
+          android:title="Review images marked for deletion" />
+
+    <item android:id="@+id/confirm_images_deletion"
+        android:title="Delete images marked for deletion" />
+
+    <item android:id="@+id/choose_another_album"
+        android:title="Select different album (change path)" />
+
 </menu>
