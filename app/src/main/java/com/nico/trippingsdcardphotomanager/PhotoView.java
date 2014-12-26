@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -75,6 +76,7 @@ public class PhotoView extends Activity implements
         }
 
         findViewById(R.id.wCurrentImage).setVisibility(View.VISIBLE);
+        findViewById(R.id.wMarkForDelete).setVisibility(View.VISIBLE);
         findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
     }
 
@@ -92,14 +94,18 @@ public class PhotoView extends Activity implements
     }
 
     private void disablePhotoViewer() {
-        final Button newDir = (Button) findViewById(R.id.wEmptyAlbum_SelectNewDir);
-        newDir.setVisibility(View.VISIBLE);
-
         TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
         status.setText(R.string.status_album_is_empty);
 
-        TextView picIdx = (TextView) findViewById(R.id.wPictureIndex);
-        picIdx.setVisibility(View.INVISIBLE);
+        findViewById(R.id.wEmptyAlbum_SelectNewDir).setVisibility(View.VISIBLE);
+        findViewById(R.id.wPictureIndex).setVisibility(View.INVISIBLE);
+        findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
+    }
+
+
+    public void onMarkForDelete(View view) {
+        ImageButton btn = (ImageButton) findViewById(R.id.wMarkForDelete);
+        btn.setBackgroundResource(R.drawable.ic_marked_for_delete);
     }
 
     /**********************************************************************************************/
