@@ -5,10 +5,11 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.nico.trippingsdcardphotomanager.Model.Picture;
+import com.nico.trippingsdcardphotomanager.Model.ScaledDownPicture;
 
 import java.lang.ref.WeakReference;
 
-public class PictureResizer extends AsyncTask<Picture, Void, Picture> {
+public class PictureResizer extends AsyncTask<Picture, Void, ScaledDownPicture> {
     private final WeakReference<PictureReadyCallback> callback;
 
     public PictureResizer(PictureReadyCallback callback) {
@@ -16,11 +17,10 @@ public class PictureResizer extends AsyncTask<Picture, Void, Picture> {
     }
 
     @Override
-    protected Picture doInBackground(Picture... params) {
+    protected ScaledDownPicture doInBackground(Picture... params) {
         Picture pic = params[0];
         try {
-            pic.createResizedPicture();
-            return pic;
+            return pic.scaleDownPicture();
         } catch (Picture.InvalidImage invalidImage) {
             Log.i(PictureResizer.class.getName(), "Couldn't render image " + pic.getFileName());
             return null;
@@ -28,7 +28,7 @@ public class PictureResizer extends AsyncTask<Picture, Void, Picture> {
     }
 
     @Override
-    protected void onPostExecute(Picture pic) {
+    protected void onPostExecute(ScaledDownPicture pic) {
         PictureReadyCallback cb = callback.get();
         if (cb != null) {
             cb.onPictureLoaded(pic);
@@ -36,7 +36,7 @@ public class PictureResizer extends AsyncTask<Picture, Void, Picture> {
     }
 
     public interface PictureReadyCallback {
-        void onPictureLoaded(final Picture pic);
+        void onPictureLoaded(final ScaledDownPicture pic);
     }
 }
 

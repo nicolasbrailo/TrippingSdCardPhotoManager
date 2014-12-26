@@ -64,7 +64,6 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/ic_mark_for_delete"
         android:layout_alignBottom="@+id/wCurrentImageLoading"
         android:contentDescription="@string/description_mark_for_deletion"
         android:visibility="invisible" />

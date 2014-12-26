@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.Picture;
+import com.nico.trippingsdcardphotomanager.Model.ScaledDownPicture;
 import com.nico.trippingsdcardphotomanager.Services.PictureResizer;
 
 
@@ -30,6 +31,7 @@ public class PhotoView extends Activity implements
 
     Album album;
     private GestureDetectorCompat mDetector;
+    private boolean loadingPicture = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,44 +55,42 @@ public class PhotoView extends Activity implements
         startActivity(new Intent(this, DirSelect.class));
     }
 
-    @Override
-    public void onPictureLoaded(Picture pic) {
-        // TODO: If the user tries to display a new picture while the current one is loading
-        // we should cancel (or ignore) what's currently being resized
-
-        final ImageView wImg = (ImageView) findViewById(R.id.wCurrentImage);
-        final TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
-        try {
-            wImg.setImageBitmap(pic.getBitmap());
-            status.setText(pic.getFileName());
-            Log.i(PhotoView.class.getName(), "Loaded " + pic.getFileName());
-        } catch (Picture.InvalidImage invalidImage) {
-            final String msg = getResources().getString(R.string.status_invalid_picture);
-            status.setText(String.format(msg, pic.getFileName()));
-            Log.i(PhotoView.class.getName(), "Couldn't render image " + pic.getFileName());
-        } catch (Picture.MustResizePictureFirst ex) {
-            final String msg = getResources().getString(R.string.status_programmer_error);
-            status.setText(String.format(msg, pic.getFileName(), ex.getMessage()));
-            Log.i(PhotoView.class.getName(), "Programmer error when loading " + pic.getFileName() +
-                                             ": " + ex.getMessage());
-        }
-
-        findViewById(R.id.wCurrentImage).setVisibility(View.VISIBLE);
-        findViewById(R.id.wMarkForDelete).setVisibility(View.VISIBLE);
-        findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
-    }
-
     private void displayCurrentPicture() {
+        // Avoid loading a picture while processing another one
+        if (loadingPicture) return;
+
         findViewById(R.id.wCurrentImageLoading).setVisibility(View.VISIBLE);
         findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
 
+        loadingPicture = true;
         PictureResizer imgLoader = new PictureResizer(this);
         imgLoader.execute(album.getCurrentPicture());
 
         TextView picIdx = (TextView) findViewById(R.id.wPictureIndex);
         final String idxMsg = getResources().getString(R.string.status_picture_index);
-        picIdx.setText(String.format(idxMsg, album.getCurrentPosition(), album.getSize()));
+        picIdx.setText(String.format(idxMsg, album.getCurrentPosition()+1, album.getSize()));
         picIdx.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onPictureLoaded(ScaledDownPicture pic) {
+        loadingPicture = false;
+
+        final ImageView wImg = (ImageView) findViewById(R.id.wCurrentImage);
+        final TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
+        try {
+            wImg.setImageBitmap(pic.getBitmap());
+            status.setText(pic.getPicture().getFileName());
+            Log.i(PhotoView.class.getName(), "Loaded " + pic.getPicture().getFileName());
+        } catch (Picture.InvalidImage invalidImage) {
+            final String msg = getResources().getString(R.string.status_invalid_picture);
+            status.setText(String.format(msg, pic.getPicture().getFileName()));
+            Log.i(PhotoView.class.getName(), "Couldn't render image " + pic.getPicture().getFileName());
+        }
+
+        findViewById(R.id.wCurrentImage).setVisibility(View.VISIBLE);
+        findViewById(R.id.wMarkForDelete).setVisibility(View.VISIBLE);
+        findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
     }
 
     private void disablePhotoViewer() {
