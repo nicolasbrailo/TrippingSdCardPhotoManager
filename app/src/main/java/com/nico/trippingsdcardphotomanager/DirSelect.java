@@ -76,6 +76,8 @@ public class DirSelect extends Activity {
         File dp = new File(path);
         if (!dp.exists()) {
             Log.e(DirSelect.class.getName(), "Received path which doesn't exists: " + path);
+            currentPath = "/";
+            changePath(".");
             return;
         }
 

@@ -11,22 +11,27 @@ import java.io.File;
 public class ScaledDownPicture {
 
     private final Bitmap scaledPicture;
-    private final Picture picture;
 
-    ScaledDownPicture(Picture picture, WindowManager windowManager, File img) {
-        this.picture = picture;
-        final BitmapFactory.Options imgInfo = getImageInfo(img.getAbsolutePath());
+    ScaledDownPicture(WindowManager windowManager, String path) {
+        File fp = new File(path);
+        if (!fp.exists()) {
+            scaledPicture = null;
+            return;
+        }
+
+        final BitmapFactory.Options imgInfo = getImageInfo(fp.getAbsolutePath());
         imgInfo.inSampleSize = calculateScaleDownFactor(windowManager, imgInfo);
-        final Bitmap bm = BitmapFactory.decodeFile(img.getAbsolutePath(), imgInfo);
+        final Bitmap bm = BitmapFactory.decodeFile(fp.getAbsolutePath(), imgInfo);
         int nh = (int) ( bm.getHeight() * (512.0 / bm.getWidth()) );
         scaledPicture = Bitmap.createScaledBitmap(bm, 512, nh, false);
     }
 
-    public Picture getPicture() {
-        return picture;
+    public boolean isValid() {
+        return (scaledPicture != null);
     }
 
-    public Bitmap getBitmap() throws Picture.InvalidImage {
+    public Bitmap getBitmap() throws UncheckedInvalidImage {
+        if (!isValid()) throw new UncheckedInvalidImage();
         return scaledPicture;
     }
 
@@ -57,5 +62,13 @@ public class ScaledDownPicture {
         }
 
         return scaleFactor;
+    }
+
+    public static class UncheckedInvalidImage extends Throwable {
+        public UncheckedInvalidImage() {}
+        public String getMessage() {
+            return "Trying to get the bitmap for an invalid picture. This is a programming error. "
+                    + "Contact the developer of this application and tell him he sucks.";
+        }
     }
 }

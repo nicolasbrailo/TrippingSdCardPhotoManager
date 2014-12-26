@@ -1,28 +1,22 @@
 package com.nico.trippingsdcardphotomanager.Model;
 
-import android.view.WindowManager;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Album {
-    private final String path;
-    private final WindowManager windowManager;
-    private List<String> picturePaths;
+    private List<Picture> pics;
     private int currentPosition = 0;
 
-    public Album(WindowManager windowManager, final String path) {
-        this.windowManager = windowManager;
-        this.path = path;
-        this.picturePaths = readAlbumPictures(path);
+    public Album(final String path) {
+        this.pics = readAlbumPictures(path);
     }
 
     public boolean isEmpty() {
-        return picturePaths.isEmpty();
+        return pics.isEmpty();
     }
 
-    private List<String> readAlbumPictures(final String path) {
+    private List<Picture> readAlbumPictures(final String path) {
         File dp = new File(path);
 
         // If the path doesn't exist just assume it's an empty album
@@ -35,14 +29,14 @@ public class Album {
             return new ArrayList<>();
         }
 
-        List<String> files = new ArrayList<>();
+        List<Picture> pics = new ArrayList<>();
         for (File fp : dp.listFiles()) {
             if (!fp.isFile()) continue;
             if (!isPicture(fp)) continue;
-            files.add(fp.getName());
+            pics.add(new Picture(path, fp.getName()));
         }
 
-        return files;
+        return pics;
     }
 
     private boolean isPicture(File fp) {
@@ -51,7 +45,7 @@ public class Album {
     }
 
     public int getSize() {
-        return picturePaths.size();
+        return pics.size();
     }
 
     public int getCurrentPosition() {
@@ -72,11 +66,11 @@ public class Album {
 
     private void advance(int i) {
         currentPosition += i;
-        if (currentPosition >= picturePaths.size()) currentPosition = 0;
-        if (currentPosition < 0) currentPosition = picturePaths.size() - 1;
+        if (currentPosition >= pics.size()) currentPosition = 0;
+        if (currentPosition < 0) currentPosition = pics.size() - 1;
     }
 
     public Picture getCurrentPicture() {
-        return new Picture(windowManager, path, picturePaths.get(currentPosition));
+        return pics.get(currentPosition);
     }
 }

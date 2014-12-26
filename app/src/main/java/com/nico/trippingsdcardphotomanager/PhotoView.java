@@ -3,18 +3,13 @@ package com.nico.trippingsdcardphotomanager;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
@@ -40,7 +35,7 @@ public class PhotoView extends Activity implements
         mDetector = new GestureDetectorCompat(this, this);
 
         String path = getIntent().getStringExtra(ACTIVITY_PARAM_SELECTED_PATH);
-        album = new Album(getWindowManager(), path);
+        album = new Album(path);
         if (album.isEmpty()) {
             Log.i(PhotoView.class.getName(), "Received empty album " + path);
             disablePhotoViewer();
@@ -61,9 +56,10 @@ public class PhotoView extends Activity implements
 
         findViewById(R.id.wCurrentImageLoading).setVisibility(View.VISIBLE);
         findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
+        findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
 
         loadingPicture = true;
-        PictureResizer imgLoader = new PictureResizer(this);
+        PictureResizer imgLoader = new PictureResizer(this, getWindowManager());
         imgLoader.execute(album.getCurrentPicture());
 
         TextView picIdx = (TextView) findViewById(R.id.wPictureIndex);
@@ -76,21 +72,44 @@ public class PhotoView extends Activity implements
     public void onPictureLoaded(ScaledDownPicture pic) {
         loadingPicture = false;
 
-        final ImageView wImg = (ImageView) findViewById(R.id.wCurrentImage);
-        final TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
-        try {
-            wImg.setImageBitmap(pic.getBitmap());
-            status.setText(pic.getPicture().getFileName());
-            Log.i(PhotoView.class.getName(), "Loaded " + pic.getPicture().getFileName());
-        } catch (Picture.InvalidImage invalidImage) {
+        if (!pic.isValid()) {
             final String msg = getResources().getString(R.string.status_invalid_picture);
-            status.setText(String.format(msg, pic.getPicture().getFileName()));
-            Log.i(PhotoView.class.getName(), "Couldn't render image " + pic.getPicture().getFileName());
+            final TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
+            status.setText(String.format(msg, album.getCurrentPicture().getFileName()));
+            findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
+            Log.i(PhotoView.class.getName(), "Couldn't render image " + album.getCurrentPicture().getFileName());
+            return;
+        }
+
+        try {
+            final ImageView wImg = (ImageView) findViewById(R.id.wCurrentImage);
+            wImg.setImageBitmap(pic.getBitmap());
+        } catch (ScaledDownPicture.UncheckedInvalidImage ex) {
+            Log.e(PhotoView.class.getName(), "This shouldn't happen: " + ex.getMessage());
+            ex.printStackTrace();
         }
 
         findViewById(R.id.wCurrentImage).setVisibility(View.VISIBLE);
-        findViewById(R.id.wMarkForDelete).setVisibility(View.VISIBLE);
         findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
+
+        final TextView status = (TextView) findViewById(R.id.wCurrentStatusText);
+        status.setText(album.getCurrentPicture().getFileName());
+
+        displayMarkForDeleteBtn(album.getCurrentPicture());
+
+        Log.i(PhotoView.class.getName(), "Loaded " + album.getCurrentPicture().getFileName());
+    }
+
+    private void displayMarkForDeleteBtn(Picture pic) {
+        ImageButton btn = (ImageButton) findViewById(R.id.wMarkForDelete);
+
+        if (pic.isMarkedForDeletion()) {
+            btn.setBackgroundResource(R.drawable.ic_marked_for_delete);
+        } else {
+            btn.setBackgroundResource(R.drawable.ic_mark_for_delete);
+        }
+
+        btn.setVisibility(View.VISIBLE);
     }
 
     private void disablePhotoViewer() {
@@ -100,12 +119,13 @@ public class PhotoView extends Activity implements
         findViewById(R.id.wEmptyAlbum_SelectNewDir).setVisibility(View.VISIBLE);
         findViewById(R.id.wPictureIndex).setVisibility(View.INVISIBLE);
         findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
+        findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
     }
 
 
     public void onMarkForDelete(View view) {
-        ImageButton btn = (ImageButton) findViewById(R.id.wMarkForDelete);
-        btn.setBackgroundResource(R.drawable.ic_marked_for_delete);
+        album.getCurrentPicture().toggleDeletionFlag();
+        displayMarkForDeleteBtn(album.getCurrentPicture());
     }
 
     /**********************************************************************************************/

@@ -1,8 +1,8 @@
 package com.nico.trippingsdcardphotomanager.Services;
 
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.nico.trippingsdcardphotomanager.Model.Picture;
 import com.nico.trippingsdcardphotomanager.Model.ScaledDownPicture;
@@ -11,20 +11,17 @@ import java.lang.ref.WeakReference;
 
 public class PictureResizer extends AsyncTask<Picture, Void, ScaledDownPicture> {
     private final WeakReference<PictureReadyCallback> callback;
+    private final WindowManager windowManager;
 
-    public PictureResizer(PictureReadyCallback callback) {
+    public PictureResizer(PictureReadyCallback callback, WindowManager windowManager) {
         this.callback = new WeakReference<>(callback);
+        this.windowManager = windowManager;
     }
 
     @Override
     protected ScaledDownPicture doInBackground(Picture... params) {
         Picture pic = params[0];
-        try {
-            return pic.scaleDownPicture();
-        } catch (Picture.InvalidImage invalidImage) {
-            Log.i(PictureResizer.class.getName(), "Couldn't render image " + pic.getFileName());
-            return null;
-        }
+        return pic.scaleDownPicture(windowManager);
     }
 
     @Override
