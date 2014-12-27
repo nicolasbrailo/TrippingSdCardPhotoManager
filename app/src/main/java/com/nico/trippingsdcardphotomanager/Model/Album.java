@@ -79,4 +79,17 @@ public class Album {
     public Picture getCurrentPicture() {
         return pics.get(currentPosition);
     }
+
+    public String[] getFileNamesToDelete() {
+        List<String> fnames = new ArrayList<>();
+        for (Picture pic : pics) {
+            if (pic.isMarkedForDeletion()) {
+                fnames.add(pic.getFileName());
+            }
+        }
+
+        String[] strFnames = new String[fnames.size()];
+        strFnames = fnames.toArray(strFnames);
+        return strFnames;
+    }
 }

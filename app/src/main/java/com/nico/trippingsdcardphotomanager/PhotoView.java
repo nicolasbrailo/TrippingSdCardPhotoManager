@@ -1,5 +1,7 @@
 package com.nico.trippingsdcardphotomanager;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GestureDetectorCompat;
@@ -80,30 +82,49 @@ public class PhotoView extends FragmentActivity implements
     /**********************************************************************************************/
     /* Menu handling */
     /**********************************************************************************************/
+    private boolean applyFilter(PhotoViewerFilter filter, int stringId) {
+        this.photoFilter = filter;
+        photoFilter.resetPosition(album);
+        photoViewer.showPicture(album.getCurrentPicture());
+
+        CharSequence msg = getResources().getString(stringId);
+        Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
+        toast.show();
+        return true;
+    }
+
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.review_images_marked_for_deletion:
-                photoFilter = new PhotoViewerFilter.OnlyMarkedForDeletion(this);
-                photoFilter.resetPosition(album);
-                photoViewer.showPicture(album.getCurrentPicture());
                 // TODO: For some reason, if calling this with no pics marked for del then the curr
                 // pic is shown anyway
-
-                CharSequence msg = getResources().getString(R.string.status_reviewing_marked_for_delete);
-                Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
-                toast.show();
-                return true;
+                return applyFilter(new PhotoViewerFilter.OnlyMarkedForDeletion(this),
+                        R.string.status_reviewing_marked_for_delete);
 
             case R.id.stop_reviewing_images_marked_for_deletion:
-                photoFilter = new PhotoViewerFilter.NoFiltering();
                 photoViewer.setAlbum_Reenabled();
-                photoFilter.resetPosition(album);
-                photoViewer.showPicture(album.getCurrentPicture());
+                return applyFilter(new PhotoViewerFilter.NoFiltering(),
+                        R.string.status_viewing_full_album);
 
-                CharSequence msg2 = getResources().getString(R.string.status_viewing_full_album);
-                Toast toast2 = Toast.makeText(getApplicationContext(), msg2, Toast.LENGTH_LONG);
-                toast2.show();
+            case R.id.confirm_images_deletion:
+                final PhotoView self = this;
+                new AlertDialog.Builder(this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(R.string.alert_confirm_deletion_title)
+                        .setMessage(R.string.alert_confirm_deletion_msg)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.i(PhotoView.class.getName(), "Triggering photo removal.");
+                                Intent intent = new Intent(self, PicDeleterActivity.class);
+                                intent.putExtra(PicDeleterActivity.ACTIVITY_PARAM_SELECTED_PATH, album.getPath());
+                                intent.putExtra(PicDeleterActivity.ACTIVITY_PARAM_FILE_NAMES_LIST, album.getFileNamesToDelete());
+                                startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
                 return true;
 
             case R.id.choose_another_album:
@@ -123,6 +144,7 @@ public class PhotoView extends FragmentActivity implements
         if (photoFilter instanceof PhotoViewerFilter.OnlyMarkedForDeletion) {
             menu.getMenu().findItem(R.id.review_images_marked_for_deletion).setVisible(false);
             menu.getMenu().findItem(R.id.stop_reviewing_images_marked_for_deletion).setVisible(true);
+            menu.getMenu().findItem(R.id.confirm_images_deletion).setVisible(true);
         } else {
             // Use default view options
         }

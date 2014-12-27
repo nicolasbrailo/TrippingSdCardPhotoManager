@@ -10,6 +10,10 @@
         android:title="@string/menu_stop_reviewing_images_marked_for_deletion"
         android:visible="false" />
 
+    <item android:id="@+id/confirm_images_deletion"
+        android:title="@string/menu_confirm_images_deletion"
+        android:visible="false" />
+
     <item android:id="@+id/choose_another_album"
         android:title="@string/menu_choose_different_path" />
 

@@ -22,7 +22,14 @@
             android:name=".PhotoView"
             android:label="@string/title_activity_photo_view" >
         </activity>
-
+        <activity
+            android:name=".PicDeleterActivity"
+            android:label="@string/title_activity_pic_deleter"
+            android:parentActivityName=".PhotoView" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nico.trippingsdcardphotomanager.PhotoView" />
+        </activity>
     </application>
 
 </manifest>

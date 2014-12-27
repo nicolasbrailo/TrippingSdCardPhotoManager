@@ -21,5 +21,11 @@
     <string name="menu_choose_different_path">Select different album (change path)</string>
     <string name="menu_stop_reviewing_images_marked_for_deletion">View complete album</string>
     <string name="status_viewing_full_album">You are now viewing the full album</string>
+    <string name="menu_confirm_images_deletion">Delete images marked for deletion</string>
+    <string name="alert_confirm_deletion_title">Are you sure?</string>
+    <string name="alert_confirm_deletion_msg">The marked images will be deleted. Forever. There is no going back. Are you really sure?</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">Not yet</string>
+    <string name="title_activity_pic_deleter">PicDeleterActivity</string>
 
 </resources>
