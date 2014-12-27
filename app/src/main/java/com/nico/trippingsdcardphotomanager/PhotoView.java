@@ -70,7 +70,7 @@ public class PhotoView extends FragmentActivity implements
     // Called when applying a OnlyMarkedForDelete filter and there are no pictures to show
     @Override
     public void onNoPicsMarkedForDelete() {
-        photoViewer.showPhotoViewer_ForFilteredAlbum();
+        photoViewer.setAlbum_AllPicturesFiltered();
 
         CharSequence msg = getResources().getString(R.string.status_no_pictures_marked_for_deletion);
         Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
@@ -87,20 +87,29 @@ public class PhotoView extends FragmentActivity implements
                 photoFilter = new PhotoViewerFilter.OnlyMarkedForDeletion(this);
                 photoFilter.resetPosition(album);
                 photoViewer.showPicture(album.getCurrentPicture());
+                // TODO: For some reason, if calling this with no pics marked for del then the curr
+                // pic is shown anyway
 
                 CharSequence msg = getResources().getString(R.string.status_reviewing_marked_for_delete);
                 Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
                 toast.show();
                 return true;
-            case R.id.confirm_images_deletion:
-                // TODO
-                CharSequence msg2 = "Not implemented yet";
+
+            case R.id.stop_reviewing_images_marked_for_deletion:
+                photoFilter = new PhotoViewerFilter.NoFiltering();
+                photoViewer.setAlbum_Reenabled();
+                photoFilter.resetPosition(album);
+                photoViewer.showPicture(album.getCurrentPicture());
+
+                CharSequence msg2 = getResources().getString(R.string.status_viewing_full_album);
                 Toast toast2 = Toast.makeText(getApplicationContext(), msg2, Toast.LENGTH_LONG);
                 toast2.show();
                 return true;
+
             case R.id.choose_another_album:
                 startActivity(new Intent(this, DirSelect.class));
                 return true;
+
             default:
                 return false;
         }
@@ -110,6 +119,14 @@ public class PhotoView extends FragmentActivity implements
         PopupMenu menu = new PopupMenu(this, view);
         menu.getMenuInflater().inflate(R.menu.menu_photo_view, menu.getMenu());
         menu.setOnMenuItemClickListener(this);
+
+        if (photoFilter instanceof PhotoViewerFilter.OnlyMarkedForDeletion) {
+            menu.getMenu().findItem(R.id.review_images_marked_for_deletion).setVisible(false);
+            menu.getMenu().findItem(R.id.stop_reviewing_images_marked_for_deletion).setVisible(true);
+        } else {
+            // Use default view options
+        }
+
         menu.show();
     }
 

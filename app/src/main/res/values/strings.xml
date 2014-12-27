@@ -17,5 +17,9 @@
     <string name="photo_viewer_alt_tag">Picture preview</string>
     <string name="status_album_has_no_pictures_to_show">No pictures to show</string>
     <string name="status_no_pictures_marked_for_deletion">No pictures marked for deletion.</string>
+    <string name="menu_review_and_delete_pics">Delete images marked for removal...</string>
+    <string name="menu_choose_different_path">Select different album (change path)</string>
+    <string name="menu_stop_reviewing_images_marked_for_deletion">View complete album</string>
+    <string name="status_viewing_full_album">You are now viewing the full album</string>
 
 </resources>

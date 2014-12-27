@@ -1,18 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.nico.trippingsdcardphotomanager.PhotoView">
 
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
-
     <item android:id="@+id/review_images_marked_for_deletion"
-          android:title="Review images marked for deletion" />
+          android:title="@string/menu_review_and_delete_pics"
+          android:visible="true" />
 
-    <item android:id="@+id/confirm_images_deletion"
-        android:title="Delete images marked for deletion" />
+    <item android:id="@+id/stop_reviewing_images_marked_for_deletion"
+        android:title="@string/menu_stop_reviewing_images_marked_for_deletion"
+        android:visible="false" />
 
     <item android:id="@+id/choose_another_album"
-        android:title="Select different album (change path)" />
+        android:title="@string/menu_choose_different_path" />
 
 </menu>

@@ -87,6 +87,7 @@ public class PhotoViewFragment extends Fragment implements
     /* Photo viewer interface */
     /**********************************************************************************************/
     private boolean loadingPicture = false;
+    private boolean showNoPicture = false;
 
     public void showPhotoViewer_ForEmptyAlbum() {
         TextView status = (TextView) activity.findViewById(R.id.wCurrentStatusText);
@@ -100,7 +101,8 @@ public class PhotoViewFragment extends Fragment implements
     }
 
     // Called when all the pictures in the album have been filtered out
-    public void showPhotoViewer_ForFilteredAlbum() {
+    public void setAlbum_AllPicturesFiltered() {
+        showNoPicture = true;
         TextView status = (TextView) activity.findViewById(R.id.wCurrentStatusText);
         status.setText(R.string.status_album_has_no_pictures_to_show);
 
@@ -111,7 +113,17 @@ public class PhotoViewFragment extends Fragment implements
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
     }
 
+    public void setAlbum_Reenabled() {
+        showNoPicture = false;
+    }
+
     public void showPicture(Picture pic) {
+        // We're loading a picture, a second load event can't be processed
+        if (loadingPicture) return;
+
+        // The activity has temporarily disabled displaying pictures
+        if (showNoPicture) return;
+
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.VISIBLE);
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
