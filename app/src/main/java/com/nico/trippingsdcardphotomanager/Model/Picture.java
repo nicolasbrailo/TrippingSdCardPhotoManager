@@ -25,6 +25,6 @@ public class Picture {
     }
 
     public ScaledDownPicture scaleDownPicture(WindowManager windowManager) {
-        return new ScaledDownPicture(windowManager, path);
+        return new ScaledDownPicture(windowManager, this, path);
     }
 }

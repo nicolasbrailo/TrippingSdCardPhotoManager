@@ -11,8 +11,11 @@ import java.io.File;
 public class ScaledDownPicture {
 
     private final Bitmap scaledPicture;
+    private final Picture picture;
 
-    ScaledDownPicture(WindowManager windowManager, String path) {
+    ScaledDownPicture(WindowManager windowManager, Picture pic, String path) {
+        this.picture = pic;
+
         File fp = new File(path);
         if (!fp.exists()) {
             scaledPicture = null;
@@ -24,6 +27,10 @@ public class ScaledDownPicture {
         final Bitmap bm = BitmapFactory.decodeFile(fp.getAbsolutePath(), imgInfo);
         int nh = (int) ( bm.getHeight() * (512.0 / bm.getWidth()) );
         scaledPicture = Bitmap.createScaledBitmap(bm, 512, nh, false);
+    }
+
+    public Picture getPicture() {
+        return picture;
     }
 
     public boolean isValid() {

@@ -7,13 +7,19 @@ import java.util.List;
 public class Album {
     private List<Picture> pics;
     private int currentPosition = 0;
+    private String path;
 
     public Album(final String path) {
+        this.path = path;
         this.pics = readAlbumPictures(path);
     }
 
     public boolean isEmpty() {
         return pics.isEmpty();
+    }
+    
+    public String getPath() {
+        return path;
     }
 
     private List<Picture> readAlbumPictures(final String path) {
