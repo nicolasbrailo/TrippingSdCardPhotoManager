@@ -92,8 +92,22 @@ public class PhotoViewFragment extends Fragment implements
         TextView status = (TextView) activity.findViewById(R.id.wCurrentStatusText);
         status.setText(R.string.status_album_is_empty);
 
+        status.setVisibility(View.VISIBLE);
         activity.findViewById(R.id.wPictureIndex).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
+        activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
+        activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
+    }
+
+    // Called when all the pictures in the album have been filtered out
+    public void showPhotoViewer_ForFilteredAlbum() {
+        TextView status = (TextView) activity.findViewById(R.id.wCurrentStatusText);
+        status.setText(R.string.status_album_has_no_pictures_to_show);
+
+        status.setVisibility(View.VISIBLE);
+        activity.findViewById(R.id.wPictureIndex).setVisibility(View.INVISIBLE);
+        activity.findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
+        activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
     }
 

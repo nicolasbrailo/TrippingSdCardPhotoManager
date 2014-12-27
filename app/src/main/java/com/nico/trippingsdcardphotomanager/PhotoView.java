@@ -13,16 +13,19 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
+import com.nico.trippingsdcardphotomanager.Model.PhotoViewerFilter;
 
 
 public class PhotoView extends FragmentActivity implements
                         GestureDetector.OnGestureListener,
                         PopupMenu.OnMenuItemClickListener,
-                        PhotoViewFragment.AlbumContainerActivity {
+                        PhotoViewFragment.AlbumContainerActivity,
+                        PhotoViewerFilter.OnlyMarkedForDeletion.FilterCallback {
 
     public static final String ACTIVITY_PARAM_SELECTED_PATH = "com.nico.trippingsdcardphotomanager.ALBUM_PATH";
     private static final float SWIPE_THRESHOLD_VELOCITY = 100;
 
+    private PhotoViewerFilter photoFilter;
     private PhotoViewFragment photoViewer;
     private Album album;
     private GestureDetectorCompat mDetector;
@@ -34,8 +37,10 @@ public class PhotoView extends FragmentActivity implements
 
         mDetector = new GestureDetectorCompat(this, this);
         photoViewer = (PhotoViewFragment) getSupportFragmentManager().findFragmentById(R.id.wPhotoViewerFragment);
+        photoFilter = new PhotoViewerFilter.NoFiltering();
 
-        album = getAlbumOnActivityStartup();
+        String path = getIntent().getStringExtra(ACTIVITY_PARAM_SELECTED_PATH);
+        album = new Album(path);
         if (album.isEmpty()) {
             Log.i(PhotoView.class.getName(), "Received empty album " + album.getPath());
 
@@ -44,14 +49,9 @@ public class PhotoView extends FragmentActivity implements
 
         } else {
             Log.i(PhotoView.class.getName(), "Opening album " + album.getPath());
-            album.resetPosition();
+            photoFilter.resetPosition(album);
             photoViewer.showPicture(album.getCurrentPicture());
         }
-    }
-
-    protected Album getAlbumOnActivityStartup() {
-        String path = getIntent().getStringExtra(ACTIVITY_PARAM_SELECTED_PATH);
-        return new Album(path);
     }
 
     @Override
@@ -67,6 +67,16 @@ public class PhotoView extends FragmentActivity implements
         photoViewer.updateMarkForDeleteBtn(album.getCurrentPicture());
     }
 
+    // Called when applying a OnlyMarkedForDelete filter and there are no pictures to show
+    @Override
+    public void onNoPicsMarkedForDelete() {
+        photoViewer.showPhotoViewer_ForFilteredAlbum();
+
+        CharSequence msg = getResources().getString(R.string.status_no_pictures_marked_for_deletion);
+        Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
+        toast.show();
+    }
+
     /**********************************************************************************************/
     /* Menu handling */
     /**********************************************************************************************/
@@ -74,8 +84,9 @@ public class PhotoView extends FragmentActivity implements
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.review_images_marked_for_deletion:
-                album.resetPosition();
-                // displayCurrentPicture();
+                photoFilter = new PhotoViewerFilter.OnlyMarkedForDeletion(this);
+                photoFilter.resetPosition(album);
+                photoViewer.showPicture(album.getCurrentPicture());
 
                 CharSequence msg = getResources().getString(R.string.status_reviewing_marked_for_delete);
                 Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
@@ -114,9 +125,9 @@ public class PhotoView extends FragmentActivity implements
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         if((velocityX > 0) && (Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)) {
-            album.moveBackwards();
+            photoFilter.moveBackwards(album);
         } else if((velocityX < 0) && (Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)) {
-            album.moveForward();
+            photoFilter.moveForward(album);
         }
 
         photoViewer.showPicture(album.getCurrentPicture());

@@ -15,5 +15,7 @@
     <string name="status_reviewing_marked_for_delete">You are reviewing images marked for deletion. Confirm deletion in the menu..</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="photo_viewer_alt_tag">Picture preview</string>
+    <string name="status_album_has_no_pictures_to_show">No pictures to show</string>
+    <string name="status_no_pictures_marked_for_deletion">No pictures marked for deletion.</string>
 
 </resources>

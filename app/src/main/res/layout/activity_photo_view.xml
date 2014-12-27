@@ -28,9 +28,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/wOpenMenu"
         android:onClick="onOpenMenuClicked"
-        android:layout_alignBottom="@+id/wCurrentImage"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/ic_open_menu" />
+        android:background="@drawable/ic_open_menu"
+        android:layout_alignBottom="@id/wPhotoViewerFragment" />
 
 </RelativeLayout>
