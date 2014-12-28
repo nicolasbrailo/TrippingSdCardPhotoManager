@@ -74,6 +74,11 @@ public class Album {
     public void moveForward() { currentPosition = advance(1); }
     public void moveBackwards() { currentPosition = advance(-1); }
 
+    public void jumpTo(int num) {
+        int d = num - currentPosition;
+        currentPosition = advance(num);
+    }
+
     public Picture getPictureAtRelativePosition(int i) { return pics.get(advance(i)); }
     public Picture getCurrentPicture() {
         return pics.get(currentPosition);

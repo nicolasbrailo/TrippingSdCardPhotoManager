@@ -129,6 +129,10 @@ public class PhotoView extends FragmentActivity implements
                         .show();
                 return true;
 
+            case R.id.menu_goto_picture:
+                photoViewer.popupGotoPicture();
+                return true;
+
             case R.id.choose_another_album:
                 startActivity(new Intent(this, DirSelect.class));
                 return true;

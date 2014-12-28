@@ -1,12 +1,16 @@
 package com.nico.trippingsdcardphotomanager;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,6 +51,7 @@ public class PhotoViewFragment extends Fragment implements
                              Bundle savedInstanceState) {
         View fragView = inflater.inflate(R.layout.fragment_photo_view, container, false);
         fragView.findViewById(R.id.wMarkForDelete).setOnClickListener(this);
+        fragView.findViewById(R.id.wPictureIndex).setOnClickListener(this);
         return fragView;
     }
 
@@ -78,6 +83,9 @@ public class PhotoViewFragment extends Fragment implements
         switch (v.getId()) {
             case R.id.wMarkForDelete:
                 albumHolder.markForDeletionRequested();
+                break;
+            case R.id.wPictureIndex:
+                popupGotoPicture();
                 break;
             default:
                 throw new AssertionError(PhotoView.class.getName() +
@@ -208,5 +216,39 @@ public class PhotoViewFragment extends Fragment implements
         }
 
         btn.setVisibility(View.VISIBLE);
+    }
+
+    public void popupGotoPicture() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(activity.getString(R.string.title_jump_to_pic));
+        final EditText input = new EditText(activity);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    int num = Integer.parseInt(input.getText().toString());
+                    albumHolder.getAlbum().jumpTo(num-1);
+                    showPicture(albumHolder.getAlbum().getCurrentPicture());
+
+                    // Trigger a new cache warm-up at the new position
+                    setPrecacheCount(preCacheCount);
+
+                } catch (NumberFormatException ex) {
+                    Log.e(PhotoViewFragment.class.getName(), "GOTO Pic: number format is wrong.");
+                }
+            }
+        });
+
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 }
