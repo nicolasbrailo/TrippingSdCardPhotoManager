@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Album {
+    private final double CACHE_USAGE_MULTIPLIER = 0.2;
+
     private LruCache<String,ScaledDownPicture> pictureCache;
     private List<Picture> pics;
     private int currentPosition = 0;
@@ -14,7 +16,7 @@ public class Album {
 
     public Album(final String path) {
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-        final int cacheSize = maxMemory / 8;
+        final int cacheSize = (int)(maxMemory * CACHE_USAGE_MULTIPLIER);
         pictureCache = new LruCache<String, ScaledDownPicture>(cacheSize) {
             @Override
             protected int sizeOf(String key, ScaledDownPicture img) {
@@ -62,32 +64,17 @@ public class Album {
         return true;
     }
 
-    public int getSize() {
-        return pics.size();
-    }
-
+    public int getSize() { return pics.size(); }
     public int getCurrentPosition() {
         return currentPosition;
     }
-
     public void resetPosition() {
         currentPosition = 0;
     }
+    public void moveForward() { currentPosition = advance(1); }
+    public void moveBackwards() { currentPosition = advance(-1); }
 
-    public void moveForward() {
-        advance(1);
-    }
-
-    public void moveBackwards() {
-        advance(-1);
-    }
-
-    private void advance(int i) {
-        currentPosition += i;
-        if (currentPosition >= pics.size()) currentPosition = 0;
-        if (currentPosition < 0) currentPosition = pics.size() - 1;
-    }
-
+    public Picture getPictureAtRelativePosition(int i) { return pics.get(advance(i)); }
     public Picture getCurrentPicture() {
         return pics.get(currentPosition);
     }
@@ -103,5 +90,12 @@ public class Album {
         String[] strFnames = new String[fnames.size()];
         strFnames = fnames.toArray(strFnames);
         return strFnames;
+    }
+
+    private int advance(int i) {
+        int newPos = currentPosition + i;
+        if (newPos >= pics.size()) newPos = 0;
+        if (newPos< 0) newPos = pics.size() - 1;
+        return newPos;
     }
 }

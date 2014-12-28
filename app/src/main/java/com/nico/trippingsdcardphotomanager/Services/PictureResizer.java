@@ -10,11 +10,11 @@ import com.nico.trippingsdcardphotomanager.Model.ScaledDownPicture;
 import java.lang.ref.WeakReference;
 
 public class PictureResizer extends AsyncTask<Picture, Void, ScaledDownPicture> {
-    private final WeakReference<PictureReadyCallback> callback;
+    private final /*WeakReference<*/PictureReadyCallback/*>*/ callback;
     private final WindowManager windowManager;
 
-    public PictureResizer(PictureReadyCallback callback, WindowManager windowManager) {
-        this.callback = new WeakReference<>(callback);
+    public PictureResizer(WindowManager windowManager, PictureReadyCallback callback) {
+        this.callback = /*new WeakReference<>(*/callback/*)*/;
         this.windowManager = windowManager;
     }
 
@@ -26,7 +26,7 @@ public class PictureResizer extends AsyncTask<Picture, Void, ScaledDownPicture> 
 
     @Override
     protected void onPostExecute(ScaledDownPicture pic) {
-        PictureReadyCallback cb = callback.get();
+        PictureReadyCallback cb = callback/*.get()*/;
         if (cb != null) {
             cb.onPictureLoaded(pic);
         }

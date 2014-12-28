@@ -26,6 +26,7 @@ public class PhotoView extends FragmentActivity implements
 
     public static final String ACTIVITY_PARAM_SELECTED_PATH = "com.nico.trippingsdcardphotomanager.ALBUM_PATH";
     private static final float SWIPE_THRESHOLD_VELOCITY = 100;
+    private static final int DEFAULT_PRECACHE_COUNT = 3;
 
     private PhotoViewerFilter photoFilter;
     private PhotoViewFragment photoViewer;
@@ -52,6 +53,7 @@ public class PhotoView extends FragmentActivity implements
         } else {
             Log.i(PhotoView.class.getName(), "Opening album " + album.getPath());
             photoFilter.resetPosition(album);
+            photoViewer.setPrecacheCount(DEFAULT_PRECACHE_COUNT);
             photoViewer.showPicture(album.getCurrentPicture());
         }
     }

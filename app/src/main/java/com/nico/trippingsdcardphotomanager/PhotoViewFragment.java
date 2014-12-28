@@ -22,6 +22,7 @@ public class PhotoViewFragment extends Fragment implements
 
     private Activity activity;
     private AlbumContainerActivity albumHolder;
+    private int preCacheCount;
 
     public interface AlbumContainerActivity {
         public Album getAlbum();
@@ -33,6 +34,7 @@ public class PhotoViewFragment extends Fragment implements
     /**********************************************************************************************/
     public PhotoViewFragment() {
         // Required empty public constructor
+        this.preCacheCount = 0;
     }
 
     @Override
@@ -130,7 +132,7 @@ public class PhotoViewFragment extends Fragment implements
 
         loadingPicture = true;
         if (pic.needsResizing()) {
-            PictureResizer imgLoader = new PictureResizer(this, activity.getWindowManager());
+            PictureResizer imgLoader = new PictureResizer(activity.getWindowManager(), this);
             imgLoader.execute(pic);
         } else {
             onPictureLoaded(pic.getDisplayImage());
@@ -173,6 +175,27 @@ public class PhotoViewFragment extends Fragment implements
         updateMarkForDeleteBtn(pic.getPicture());
 
         Log.i(PhotoView.class.getName(), "Loaded " + pic.getPicture().getFileName());
+        precacheNextPicture(preCacheCount);
+    }
+
+    public void setPrecacheCount(int count) {
+        this.preCacheCount = count;
+
+        // Warm up cache
+        for (int i=1; i<=count; ++i) {
+            precacheNextPicture(i);
+        }
+    }
+
+    private void precacheNextPicture(int count) {
+        Log.i(PhotoViewFragment.class.getName(), "Precaching  "+count);
+        if (count <= 0) return;
+        new PictureResizer(activity.getWindowManager(), new PictureResizer.PictureReadyCallback() {
+            @Override
+            public void onPictureLoaded(ScaledDownPicture pic) {
+                Log.i(PhotoViewFragment.class.getName(), "Precached "+pic.getPicture().getFileName());
+            }
+        }).execute(albumHolder.getAlbum().getPictureAtRelativePosition(count));
     }
 
     public void updateMarkForDeleteBtn(Picture pic) {
