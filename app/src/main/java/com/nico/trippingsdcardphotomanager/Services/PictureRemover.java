@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.util.Log;
 
+import java.io.File;
+
 public class PictureRemover extends AsyncTask<Void, Integer, Void> {
     public interface Callback {
         public void onPictureRemoverComplete();
@@ -31,8 +33,8 @@ public class PictureRemover extends AsyncTask<Void, Integer, Void> {
 
             String fname = path + fnames[i];
             Log.i(PictureRemover.class.getName(), "Removing " + fname);
-            for (int j=0; j<1000000; ++j)
-                for (int k=0; k<100; ++k);
+            File fp = new File(fname);
+            fp.delete();
         }
         return null;
     }

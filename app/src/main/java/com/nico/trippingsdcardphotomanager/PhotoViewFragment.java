@@ -190,6 +190,7 @@ public class PhotoViewFragment extends Fragment implements
         this.preCacheCount = count;
 
         // Warm up cache
+        // TODO: This seems to block the display til all the caching is done
         for (int i=1; i<=count; ++i) {
             precacheNextPicture(i);
         }
