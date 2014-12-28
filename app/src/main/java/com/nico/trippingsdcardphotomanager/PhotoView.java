@@ -3,6 +3,7 @@ package com.nico.trippingsdcardphotomanager;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GestureDetectorCompat;
 import android.os.Bundle;
@@ -79,6 +80,13 @@ public class PhotoView extends FragmentActivity implements
         CharSequence msg = getResources().getString(R.string.status_no_pictures_marked_for_deletion);
         Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
         toast.show();
+    }
+
+    public void openFullImage(View view) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.parse("file://" + album.getCurrentPicture().getFullPath()), "image/*");
+        startActivity(intent);
     }
 
     /**********************************************************************************************/

@@ -34,5 +34,7 @@
     <string name="label_deleting_selected_files_done">Completed</string>
     <string name="menu_goto_picture">Jump to picture...</string>
     <string name="title_jump_to_pic">Jump to picture</string>
+    <string name="alt_text_open_menu">Open application menu</string>
+    <string name="alt_text_open_full_img">View full picture</string>
 
 </resources>

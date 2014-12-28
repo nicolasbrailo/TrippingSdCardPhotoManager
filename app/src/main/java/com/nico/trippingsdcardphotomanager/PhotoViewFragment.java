@@ -213,7 +213,7 @@ public class PhotoViewFragment extends Fragment implements
         if (pic.isMarkedForDeletion()) {
             btn.setBackgroundResource(R.drawable.ic_marked_for_delete);
         } else {
-            btn.setBackgroundResource(R.drawable.ic_mark_for_delete);
+            btn.setBackgroundResource(android.R.drawable.ic_menu_delete);
         }
 
         btn.setVisibility(View.VISIBLE);

@@ -15,6 +15,10 @@ public class Picture {
         this.fname = fname;
     }
 
+    public String getFullPath() {
+        return path;
+    }
+
     public String getFileName() {
         return fname;
     }
