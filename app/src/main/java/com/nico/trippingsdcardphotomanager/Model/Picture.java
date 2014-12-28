@@ -36,6 +36,9 @@ public class Picture {
     }
 
     public ScaledDownPicture scaleDownPicture(WindowManager windowManager) {
+        // If we were cached while waiting to be loaded, just use the cache
+        if (!needsResizing()) return getDisplayImage();
+
         ScaledDownPicture sp = new ScaledDownPicture(windowManager, this, path);
         pictureCache.put(fname, sp);
         return sp;
