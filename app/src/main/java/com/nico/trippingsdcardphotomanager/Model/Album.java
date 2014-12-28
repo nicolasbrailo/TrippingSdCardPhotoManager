@@ -1,15 +1,27 @@
 package com.nico.trippingsdcardphotomanager.Model;
 
+import android.util.LruCache;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Album {
+    private LruCache<String,ScaledDownPicture> pictureCache;
     private List<Picture> pics;
     private int currentPosition = 0;
     private String path;
 
     public Album(final String path) {
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = maxMemory / 8;
+        pictureCache = new LruCache<String, ScaledDownPicture>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, ScaledDownPicture img) {
+                return img.getByteCount() / 1024;
+            }
+        };
+
         this.path = path;
         this.pics = readAlbumPictures(path);
     }
@@ -39,7 +51,7 @@ public class Album {
         for (File fp : dp.listFiles()) {
             if (!fp.isFile()) continue;
             if (!isPicture(fp)) continue;
-            pics.add(new Picture(path, fp.getName()));
+            pics.add(new Picture(pictureCache, path, fp.getName()));
         }
 
         return pics;

@@ -103,7 +103,7 @@ public class DirSelect extends Activity {
         SharedPreferences.Editor cfg = getPreferences(0).edit();
         cfg.putString(PREFERENCES_LAST_USED_DIR, currentPath);
         cfg.apply();
-        Log.e(DirSelect.class.getName(), "Saved path selection " + currentPath + ". Starting new activity.");
+        Log.i(DirSelect.class.getName(), "Saved path selection " + currentPath + ". Starting new activity.");
 
         Intent intent = new Intent(this, PhotoView.class);
         intent.putExtra(PhotoView.ACTIVITY_PARAM_SELECTED_PATH, currentPath);

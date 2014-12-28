@@ -71,6 +71,8 @@ public class ScaledDownPicture {
         return scaleFactor;
     }
 
+    public int getByteCount() { return scaledPicture.getByteCount(); }
+
     public static class UncheckedInvalidImage extends Throwable {
         public UncheckedInvalidImage() {}
         public String getMessage() {

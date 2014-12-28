@@ -129,8 +129,12 @@ public class PhotoViewFragment extends Fragment implements
         activity.findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
 
         loadingPicture = true;
-        PictureResizer imgLoader = new PictureResizer(this, activity.getWindowManager());
-        imgLoader.execute(pic);
+        if (pic.needsResizing()) {
+            PictureResizer imgLoader = new PictureResizer(this, activity.getWindowManager());
+            imgLoader.execute(pic);
+        } else {
+            onPictureLoaded(pic.getDisplayImage());
+        }
 
         TextView picIdx = (TextView) activity.findViewById(R.id.wPictureIndex);
         final String idxMsg = getResources().getString(R.string.status_picture_index);

@@ -1,13 +1,16 @@
 package com.nico.trippingsdcardphotomanager.Model;
 
+import android.util.LruCache;
 import android.view.WindowManager;
 
 public class Picture {
+    private final LruCache<String, ScaledDownPicture> pictureCache;
     private final String path;
     private final String fname;
     private boolean markedForDeletion = false;
 
-    public Picture(final String path, final String fname) {
+    public Picture(LruCache<String, ScaledDownPicture> pictureCache, final String path, final String fname) {
+        this.pictureCache = pictureCache;
         this.path = path + "/" + fname;
         this.fname = fname;
     }
@@ -24,7 +27,17 @@ public class Picture {
         return markedForDeletion;
     }
 
+    public boolean needsResizing() { return (pictureCache.get(fname) == null); }
+
+    public ScaledDownPicture getDisplayImage() {
+        ScaledDownPicture pic = pictureCache.get(fname);
+        if (pic == null) throw new AssertionError("Programmer sucks error: called getDisplayImage on a non-cached picture");
+        return pic;
+    }
+
     public ScaledDownPicture scaleDownPicture(WindowManager windowManager) {
-        return new ScaledDownPicture(windowManager, this, path);
+        ScaledDownPicture sp = new ScaledDownPicture(windowManager, this, path);
+        pictureCache.put(fname, sp);
+        return sp;
     }
 }
