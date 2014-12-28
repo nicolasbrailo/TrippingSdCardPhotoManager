@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.PhotoViewerFilter;
+import com.nico.trippingsdcardphotomanager.PictureMogrifier.PictureMogrifier;
 
 
 public class PhotoView extends FragmentActivity implements
@@ -57,6 +58,8 @@ public class PhotoView extends FragmentActivity implements
             photoViewer.setPrecacheCount(DEFAULT_PRECACHE_COUNT);
             photoViewer.showPicture(album.getCurrentPicture());
         }
+
+        Log.i(PhotoView.class.getName(), "Meaning of life = " + new PictureMogrifier().getMeaningOfLife());
     }
 
     @Override
