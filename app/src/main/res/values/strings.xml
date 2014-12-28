@@ -27,5 +27,10 @@
     <string name="yes">Yes</string>
     <string name="cancel">Not yet</string>
     <string name="title_activity_pic_deleter">PicDeleterActivity</string>
+    <string name="btn_stop_removal_operation">Stop Removal</string>
+    <string name="btn_back_to_album">Go back to album</string>
+    <string name="label_deleting_selected_files">Deleting selected files from %1$s...</string>
+    <string name="label_deleting_selected_files_cancelled">Partially cancelled...</string>
+    <string name="label_deleting_selected_files_done">Completed</string>
 
 </resources>
