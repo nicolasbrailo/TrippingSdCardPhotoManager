@@ -293,9 +293,9 @@
 #endif
 
 /* Define to 1 if you have the `getdtablesize' function. */
-#ifndef MAGICKCORE_HAVE_GETDTABLESIZE
-#define MAGICKCORE_HAVE_GETDTABLESIZE 1
-#endif
+// #ifndef MAGICKCORE_HAVE_GETDTABLESIZE
+// #define MAGICKCORE_HAVE_GETDTABLESIZE 1
+// #endif
 
 /* Define to 1 if you have the `getexecname' function. */
 /* #undef HAVE_GETEXECNAME */
@@ -518,9 +518,9 @@
 #endif
 
 /* Define to 1 if you have the `posix_fallocate' function. */
-#ifndef MAGICKCORE_HAVE_POSIX_FALLOCATE
-#define MAGICKCORE_HAVE_POSIX_FALLOCATE 1
-#endif
+// #ifndef MAGICKCORE_HAVE_POSIX_FALLOCATE
+// #define MAGICKCORE_HAVE_POSIX_FALLOCATE 1
+// #endif
 
 /* Define to 1 if you have the `posix_madvise' function. */
 #ifndef MAGICKCORE_HAVE_POSIX_MADVISE
@@ -528,9 +528,9 @@
 #endif
 
 /* Define to 1 if you have the `posix_memalign' function. */
-#ifndef MAGICKCORE_HAVE_POSIX_MEMALIGN
-#define MAGICKCORE_HAVE_POSIX_MEMALIGN 1
-#endif
+// #ifndef MAGICKCORE_HAVE_POSIX_MEMALIGN
+// #define MAGICKCORE_HAVE_POSIX_MEMALIGN 1
+// #endif
 
 /* Define to 1 if you have the `posix_spawnp' function. */
 #ifndef MAGICKCORE_HAVE_POSIX_SPAWNP
@@ -760,9 +760,9 @@
 #endif
 
 /* Define to 1 if you have the `strtod_l' function. */
-#ifndef MAGICKCORE_HAVE_STRTOD_L
-#define MAGICKCORE_HAVE_STRTOD_L 1
-#endif
+// #ifndef MAGICKCORE_HAVE_STRTOD_L
+// #define MAGICKCORE_HAVE_STRTOD_L 1
+// #endif
 
 /* Define to 1 if you have the `strtol' function. */
 #ifndef MAGICKCORE_HAVE_STRTOL
@@ -1011,9 +1011,9 @@
 #endif
 
 /* Define to 1 if you have the <xlocale.h> header file. */
-#ifndef MAGICKCORE_HAVE_XLOCALE_H
-#define MAGICKCORE_HAVE_XLOCALE_H 1
-#endif
+// #ifndef MAGICKCORE_HAVE_XLOCALE_H
+// #define MAGICKCORE_HAVE_XLOCALE_H 1
+// #endif
 
 /* Define to 1 if you have the `_aligned_malloc' function. */
 /* #undef HAVE__ALIGNED_MALLOC */
