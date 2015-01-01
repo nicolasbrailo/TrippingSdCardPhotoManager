@@ -1,35 +1,71 @@
 #include <jni.h>
 
 #include <android/log.h>
-#define LOG(...) __android_log_print(ANDROID_LOG_VERBOSE, "NDK APP", __VA_ARGS__);
+#define APP_NAME "ndk_mogrify"
+#define LOG(...) __android_log_print(ANDROID_LOG_VERBOSE, APP_NAME, __VA_ARGS__);
+
+#include <string.h>
 
 #include "wand/studio.h"
 #include "wand/MagickWand.h"
 
+void free_all(unsigned argc, char **argv)
+{
+    if (!argv) return;
+
+    int i = 0;
+    while ((i < argc) && (argv[i] != NULL)) {
+        free(argv[i]);
+        ++i;
+    }
+
+    free(argv);
+}
 
 JNIEXPORT jint JNICALL
 Java_com_nico_trippingsdcardphotomanager_PictureMogrifier_PictureMogrifier_mogrify
     (JNIEnv *env, jobject self, jobjectArray java_argv)
 {
-    const size_t argc = (*env)->GetArrayLength(env, java_argv);
+    const size_t jargc = (*env)->GetArrayLength(env, java_argv);
 
-    int i;
-    for (i=0; i < argc; i++) {
-        jstring jstr = (jstring) (*env)->GetObjectArrayElement(env, java_argv, i);
-        const char *str = (*env)->GetStringUTFChars(env, jstr, 0);
-        LOG("Str[%d] = %s", i, str);
-        (*env)->ReleaseStringUTFChars(env, jstr, str);
+    // argv == { binary name, *java_argv, NULL }
+    const size_t argc = jargc + 2;
+    char **argv = malloc(argc * sizeof(char*));
+    if (!argv) {
+        LOG("Malloc fail");
+        return 1;
     }
 
-    return 42;
+    memset(argv, 0, argc * sizeof(char*));
 
+    // Use a dummy bin-name
+    argv[0] = strdup(APP_NAME);
+    if (!argv[0]) {
+        LOG("Malloc fail");
+        free_all(argc, argv);
+        return 1;
+    }
+    
+    // Copy all the args from java land
+    for (int i=0; i < jargc; i++) {
+        const jstring jstr = (jstring) (*env)->GetObjectArrayElement(env, java_argv, i);
+        const char *str = (*env)->GetStringUTFChars(env, jstr, 0);
+        argv[i+1] = strdup(str);
+        (*env)->ReleaseStringUTFChars(env, jstr, str);
 
-    /*
-    char prog_name[] = "ndk_mogrify";
-    char *argv[] = {prog_name, 0};
-    int argc = 1;
+        if (!argv[i+1]) {
+            LOG("Jstr copy fail");
+            free_all(argc, argv);
+            return 1;
+        }
+    }
 
-    // This stuff was copypasted from Image magick's mogrify.c and mogrified to work with Android
+    for (int i=0; i < argc; i++) {
+        LOG("Calling %s - argc[%d] = %s", APP_NAME, i, argv[i]);
+    }
+
+    // This stuff was copypasted from Image magick's mogrify.c and mogrified 
+    // to work with Android
     ExceptionInfo *exception;
     ImageInfo *image_info;
     MagickBooleanType status;
@@ -46,5 +82,5 @@ Java_com_nico_trippingsdcardphotomanager_PictureMogrifier_PictureMogrifier_mogri
     MagickCoreTerminus();
 
     return(status != MagickFalse ? 0 : 1);
-    */
 }
+
