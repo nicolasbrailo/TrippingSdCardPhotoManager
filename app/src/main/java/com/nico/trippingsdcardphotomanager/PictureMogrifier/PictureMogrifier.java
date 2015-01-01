@@ -5,5 +5,5 @@ public class PictureMogrifier {
         System.loadLibrary("trippingImageMogrifier");
     }
 
-    public native String getMeaningOfLife();
+    public static native int mogrify(String[] argv);
 }

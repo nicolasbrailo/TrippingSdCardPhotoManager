@@ -59,7 +59,10 @@ public class PhotoView extends FragmentActivity implements
             photoViewer.showPicture(album.getCurrentPicture());
         }
 
-        Log.i(PhotoView.class.getName(), "Meaning of life = " + new PictureMogrifier().getMeaningOfLife());
+        PictureMogrifier mogrifier = new PictureMogrifier();
+        String argv[] = {"Foo", "Bar", "Baz"};
+        int meaning = mogrifier.mogrify(argv);
+        Log.i(PhotoView.class.getName(), "Meaning of life = " + meaning);
     }
 
     @Override

@@ -248,6 +248,6 @@ LOCAL_SRC_FILES := mogrify_ndk_bridge.c		 \
 				   magick/delegate.c         \
 				   mogrify.c                 \
 
-LOCAL_LDLIBS += -lm -lz
+LOCAL_LDLIBS += -lm -lz -llog
 
 include $(BUILD_SHARED_LIBRARY)
