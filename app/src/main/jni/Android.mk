@@ -2,7 +2,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := trippingImageMogrifier
-LOCAL_SRC_FILES := holamundo.c				 \
+LOCAL_SRC_FILES := mogrify_ndk_bridge.c		 \
 				   filters/analyze.c		 \
 				   coders/aai.c              \
 				   coders/art.c              \
