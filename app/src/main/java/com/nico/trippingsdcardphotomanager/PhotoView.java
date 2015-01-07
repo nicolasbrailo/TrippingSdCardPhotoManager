@@ -58,11 +58,6 @@ public class PhotoView extends FragmentActivity implements
             photoViewer.setPrecacheCount(DEFAULT_PRECACHE_COUNT);
             photoViewer.showPicture(album.getCurrentPicture());
         }
-
-        PictureMogrifier mogrifier = new PictureMogrifier();
-        String argv[] = {"Foo", "Bar", "Baz"};
-        int meaning = mogrifier.mogrify(argv);
-        Log.i(PhotoView.class.getName(), "Meaning of life = " + meaning);
     }
 
     @Override
@@ -93,6 +88,13 @@ public class PhotoView extends FragmentActivity implements
         intent.setAction(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.parse("file://" + album.getCurrentPicture().getFullPath()), "image/*");
         startActivity(intent);
+    }
+
+    public void mogrifyImg(View view) {
+        PictureMogrifier mogrifier = new PictureMogrifier();
+        String argv[] = {"-quality", "8", album.getCurrentPicture().getFullPath()};
+        int meaning = mogrifier.mogrify(argv);
+        Log.i(PhotoView.class.getName(), "Meaning of life = " + meaning);
     }
 
     /**********************************************************************************************/
