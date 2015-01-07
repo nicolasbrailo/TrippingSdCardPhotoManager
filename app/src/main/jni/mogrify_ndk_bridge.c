@@ -29,20 +29,21 @@ Java_com_nico_trippingsdcardphotomanager_PictureMogrifier_PictureMogrifier_mogri
     const size_t jargc = (*env)->GetArrayLength(env, java_argv);
 
     // argv == { binary name, *java_argv, NULL }
-    const size_t argc = jargc + 2;
-    char **argv = malloc(argc * sizeof(char*));
+    // argc ==             0,          1, N/A
+    const size_t argc = jargc + 1;
+    char **argv = malloc((argc+1) * sizeof(char*));
     if (!argv) {
         LOG("Malloc fail");
         return 1;
     }
 
-    memset(argv, 0, argc * sizeof(char*));
+    memset(argv, 0, (argc+1) * sizeof(char*));
 
     // Use a dummy bin-name
     argv[0] = strdup(APP_NAME);
     if (!argv[0]) {
         LOG("Malloc fail");
-        free_all(argc, argv);
+        free_all(argc+1, argv);
         return 1;
     }
     
@@ -55,17 +56,22 @@ Java_com_nico_trippingsdcardphotomanager_PictureMogrifier_PictureMogrifier_mogri
 
         if (!argv[i+1]) {
             LOG("Jstr copy fail");
-            free_all(argc, argv);
+            free_all(argc+1, argv);
             return 1;
         }
     }
 
-    for (int i=0; i < argc; i++) {
+    for (int i=0; i <= argc; i++) {
         LOG("Calling %s - argc[%d] = %s", APP_NAME, i, argv[i]);
     }
 
-    // This stuff was copypasted from Image magick's mogrify.c and mogrified 
-    // to work with Android
+    /* ndk debugging FTW
+    int x = 1;
+    while (x) ;
+    */
+
+    // This stuff was copypasted from Image magick's mogrify.c and
+    // transmogrified to work with Android. Lol, pun.
     ExceptionInfo *exception;
     ImageInfo *image_info;
     MagickBooleanType status;
