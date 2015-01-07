@@ -9,7 +9,7 @@
     <string name="select_new_path">Choose new album</string>
     <string name="status_album_is_empty">This album is empty, choose a new one.</string>
     <string name="status_invalid_picture">%1$s is not a valid picture</string>
-    <string name="status_picture_index">%1$d of %2$d</string>
+    <string name="status_picture_index">Picture %1$d of %2$d\n%3$s\nSize: %4$.2f MB</string>
     <string name="status_programmer_error">Error when loading %1$s. The programmer of this application sucks: %2$s</string>
     <string name="description_mark_for_deletion">Mark this image for deletion</string>
     <string name="status_reviewing_marked_for_delete">You are reviewing images marked for deletion. Confirm deletion in the menu..</string>

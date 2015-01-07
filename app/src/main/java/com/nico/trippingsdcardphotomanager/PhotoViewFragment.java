@@ -51,7 +51,7 @@ public class PhotoViewFragment extends Fragment implements
                              Bundle savedInstanceState) {
         View fragView = inflater.inflate(R.layout.fragment_photo_view, container, false);
         fragView.findViewById(R.id.wMarkForDelete).setOnClickListener(this);
-        fragView.findViewById(R.id.wPictureIndex).setOnClickListener(this);
+        fragView.findViewById(R.id.wPictureStats).setOnClickListener(this);
         return fragView;
     }
 
@@ -84,8 +84,9 @@ public class PhotoViewFragment extends Fragment implements
             case R.id.wMarkForDelete:
                 albumHolder.markForDeletionRequested();
                 break;
-            case R.id.wPictureIndex:
+            case R.id.wPictureStats:
                 popupGotoPicture();
+                // TODO: minimize stats
                 break;
             default:
                 throw new AssertionError(PhotoView.class.getName() +
@@ -100,11 +101,8 @@ public class PhotoViewFragment extends Fragment implements
     private boolean showNoPicture = false;
 
     public void showPhotoViewer_ForEmptyAlbum() {
-        TextView status = (TextView) activity.findViewById(R.id.wCurrentStatusText);
-        status.setText(R.string.status_album_is_empty);
-
-        status.setVisibility(View.VISIBLE);
-        activity.findViewById(R.id.wPictureIndex).setVisibility(View.INVISIBLE);
+        setCurrentStatusText(getResources().getString(R.string.status_album_is_empty));
+        activity.findViewById(R.id.wPictureStats).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
@@ -113,11 +111,8 @@ public class PhotoViewFragment extends Fragment implements
     // Called when all the pictures in the album have been filtered out
     public void setAlbum_AllPicturesFiltered() {
         showNoPicture = true;
-        TextView status = (TextView) activity.findViewById(R.id.wCurrentStatusText);
-        status.setText(R.string.status_album_has_no_pictures_to_show);
-
-        status.setVisibility(View.VISIBLE);
-        activity.findViewById(R.id.wPictureIndex).setVisibility(View.INVISIBLE);
+        setCurrentStatusText(getResources().getString(R.string.status_album_has_no_pictures_to_show));
+        activity.findViewById(R.id.wPictureStats).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
@@ -125,6 +120,28 @@ public class PhotoViewFragment extends Fragment implements
 
     public void setAlbum_Reenabled() {
         showNoPicture = false;
+    }
+
+    private void setCurrentStatusText(String msg) {
+        TextView picStats = (TextView) activity.findViewById(R.id.wPictureStats);
+        picStats.setText(msg);
+        picStats.setVisibility(View.VISIBLE);
+
+        final ImageView overlay = (ImageView) activity.findViewById(R.id.statusOverlay);
+        overlay.setX( picStats.getX()-5 );  // Start 5 units before to get some padding
+        overlay.setY( picStats.getY()-5 );
+        overlay.setMinimumWidth( picStats.getWidth() + 5 );
+        overlay.setMinimumHeight( picStats.getHeight() + 5 );
+        overlay.setVisibility(View.VISIBLE);
+    }
+
+    private void setCurrentStatusText(Picture pic) {
+        String formattedMsg = String.format(getResources().getString(R.string.status_picture_index),
+                albumHolder.getAlbum().getCurrentPosition() + 1,
+                albumHolder.getAlbum().getSize(),
+                pic.getFileName(),
+                pic.getFileSizeInMb());
+        setCurrentStatusText(formattedMsg);
     }
 
     public void showPicture(Picture pic) {
@@ -145,11 +162,6 @@ public class PhotoViewFragment extends Fragment implements
         } else {
             onPictureLoaded(pic.getDisplayImage());
         }
-
-        TextView picIdx = (TextView) activity.findViewById(R.id.wPictureIndex);
-        final String idxMsg = getResources().getString(R.string.status_picture_index);
-        picIdx.setText(String.format(idxMsg, albumHolder.getAlbum().getCurrentPosition() + 1, albumHolder.getAlbum().getSize()));
-        picIdx.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -159,8 +171,7 @@ public class PhotoViewFragment extends Fragment implements
 
         if (!pic.isValid()) {
             final String msg = getResources().getString(R.string.status_invalid_picture);
-            final TextView status = (TextView) activity.findViewById(R.id.wCurrentStatusText);
-            status.setText(String.format(msg, pic.getPicture().getFileName()));
+            setCurrentStatusText(String.format(msg, pic.getPicture().getFileName()));
             activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
             Log.i(PhotoView.class.getName(), "Couldn't render image " + pic.getPicture().getFileName());
             return;
@@ -177,9 +188,7 @@ public class PhotoViewFragment extends Fragment implements
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.VISIBLE);
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
 
-        final TextView status = (TextView) activity.findViewById(R.id.wCurrentStatusText);
-        status.setText(pic.getPicture().getFileName());
-
+        setCurrentStatusText(pic.getPicture());
         updateMarkForDeleteBtn(pic.getPicture());
 
         Log.i(PhotoView.class.getName(), "Loaded " + pic.getPicture().getFileName());

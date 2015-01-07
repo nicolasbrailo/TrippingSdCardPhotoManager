@@ -3,6 +3,8 @@ package com.nico.trippingsdcardphotomanager.Model;
 import android.util.LruCache;
 import android.view.WindowManager;
 
+import java.io.File;
+
 public class Picture {
     private final LruCache<String, ScaledDownPicture> pictureCache;
     private final String path;
@@ -46,5 +48,9 @@ public class Picture {
         ScaledDownPicture sp = new ScaledDownPicture(windowManager, this, path);
         pictureCache.put(fname, sp);
         return sp;
+    }
+
+    public float getFileSizeInMb() {
+        return new File(path).length() / 1024f / 1024f;
     }
 }
