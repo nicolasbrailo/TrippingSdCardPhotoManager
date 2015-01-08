@@ -6,32 +6,33 @@
     android:gravity="end">
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="50dp"
         android:id="@+id/wPhotoActions_MarkForDelete"
         android:contentDescription="@string/description_mark_for_deletion"
         android:src="@android:drawable/ic_delete"
+        android:background="@null"
         android:clickable="true" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
         android:text=""
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="50dp"
         android:id="@+id/wPhotoActions_MarkForCompress"
         android:contentDescription="@string/description_mark_for_compression"
         android:background="@drawable/ic_compress"
         android:clickable="true"
-        android:cropToPadding="false"
         android:gravity="bottom|right"
         android:textColor="#ffff0e00" />
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="50dp"
         android:id="@+id/wPhotoActions_OpenFullImage"
         android:src="@android:drawable/ic_menu_zoom"
         android:clickable="true"
+        android:background="@null"
         android:contentDescription="@string/alt_text_open_full_img" />
 
 </LinearLayout>
