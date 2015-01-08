@@ -2,23 +2,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.nico.trippingsdcardphotomanager.PhotoView">
 
-    <item android:id="@+id/review_images_marked_for_deletion"
-          android:title="@string/menu_review_and_delete_pics"
+    <item android:id="@+id/menu_review_pics_and_apply_changes"
+          android:title="@string/menu_review_pics_and_apply_changes"
           android:visible="true" />
 
-    <item android:id="@+id/stop_reviewing_images_marked_for_deletion"
-        android:title="@string/menu_stop_reviewing_images_marked_for_deletion"
+    <item android:id="@+id/menu_stop_reviewing_changes_and_view_full_album"
+        android:title="@string/menu_stop_reviewing_changes_and_view_full_album"
         android:visible="false" />
 
-    <item android:id="@+id/confirm_images_deletion"
-        android:title="@string/menu_confirm_images_deletion"
+    <item android:id="@+id/menu_apply_pending_changes"
+        android:title="@string/menu_apply_pending_changes"
         android:visible="false" />
 
     <item android:id="@+id/menu_goto_picture"
         android:title="@string/menu_goto_picture"
         android:visible="true" />
 
-    <item android:id="@+id/choose_another_album"
+    <item android:id="@+id/menu_choose_another_album"
         android:title="@string/menu_choose_different_path" />
 
 </menu>

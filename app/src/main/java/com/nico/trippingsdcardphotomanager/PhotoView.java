@@ -28,7 +28,8 @@ public class PhotoView extends FragmentActivity implements
                         PopupMenu.OnMenuItemClickListener,
                         PhotoViewFragment.PhotoShownCallbacks,
                         AlbumContainer,
-                        PhotoViewerFilter.OnlyMarkedForDeletion.FilterCallback, View.OnClickListener {
+                        PhotoViewerFilter.FilterCallback,
+                        View.OnClickListener {
 
     public static final String ACTIVITY_PARAM_SELECTED_PATH = "com.nico.trippingsdcardphotomanager.ALBUM_PATH";
     private static final float SWIPE_THRESHOLD_VELOCITY = 100;
@@ -110,7 +111,7 @@ public class PhotoView extends FragmentActivity implements
 
     // Called when applying a OnlyMarkedForDelete filter and there are no pictures to show
     @Override
-    public void onNoPicsMarkedForDelete() {
+    public void onAllPicsFilteredOut() {
         findViewById(R.id.wPhotoViewerFragment).setVisibility(View.INVISIBLE);
         findViewById(R.id.wPhotoActionsFragment).setVisibility(View.GONE);
         setStatusMessage(getResources().getString(R.string.status_album_has_no_pictures_to_show));
@@ -144,26 +145,27 @@ public class PhotoView extends FragmentActivity implements
     public boolean onMenuItemClick(MenuItem item) {
         // TODO: Remove menu when no pics in the album
         switch (item.getItemId()) {
-            case R.id.review_images_marked_for_deletion:
-                // TODO: For some reason, if calling this with no pics marked for del then the curr
+            case R.id.menu_review_pics_and_apply_changes:
+                // TODO: For some reason, if calling this with no changes pending, then the curr
                 // pic is shown anyway
-                return applyFilter(new PhotoViewerFilter.OnlyMarkedForDeletion(this),
-                        R.string.status_reviewing_marked_for_delete);
+                return applyFilter(new PhotoViewerFilter.OnlyWithPendingOps(this),
+                        R.string.status_reviewing_pending_ops);
 
-            case R.id.stop_reviewing_images_marked_for_deletion:
+            case R.id.menu_stop_reviewing_changes_and_view_full_album:
                 return applyFilter(new PhotoViewerFilter.NoFiltering(),
                         R.string.status_viewing_full_album);
 
-            case R.id.confirm_images_deletion:
+            case R.id.menu_apply_pending_changes:
                 final PhotoView self = this;
                 new AlertDialog.Builder(this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle(R.string.alert_confirm_deletion_title)
-                        .setMessage(R.string.alert_confirm_deletion_msg)
+                        .setTitle(R.string.alert_confirm_pending_ops_title)
+                        .setMessage(R.string.alert_confirm_pending_ops_msg)
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Log.i(PhotoView.class.getName(), "Triggering photo removal.");
+                                Log.i(PhotoView.class.getName(), "Starting activity to apply pending changes.");
+                                // TODO rename class (and strings), pass album instead of paths (!)
                                 Intent intent = new Intent(self, PicDeleterActivity.class);
                                 intent.putExtra(PicDeleterActivity.ACTIVITY_PARAM_SELECTED_PATH, album.getPath());
                                 intent.putExtra(PicDeleterActivity.ACTIVITY_PARAM_FILE_NAMES_LIST, album.getFileNamesToDelete());
@@ -178,7 +180,7 @@ public class PhotoView extends FragmentActivity implements
                 popupGotoPicture();
                 return true;
 
-            case R.id.choose_another_album:
+            case R.id.menu_choose_another_album:
                 startActivity(new Intent(this, DirSelect.class));
                 return true;
 
@@ -192,10 +194,10 @@ public class PhotoView extends FragmentActivity implements
         menu.getMenuInflater().inflate(R.menu.menu_photo_view, menu.getMenu());
         menu.setOnMenuItemClickListener(this);
 
-        if (photoFilter instanceof PhotoViewerFilter.OnlyMarkedForDeletion) {
-            menu.getMenu().findItem(R.id.review_images_marked_for_deletion).setVisible(false);
-            menu.getMenu().findItem(R.id.stop_reviewing_images_marked_for_deletion).setVisible(true);
-            menu.getMenu().findItem(R.id.confirm_images_deletion).setVisible(true);
+        if (photoFilter instanceof PhotoViewerFilter.OnlyWithPendingOps) {
+            menu.getMenu().findItem(R.id.menu_review_pics_and_apply_changes).setVisible(false);
+            menu.getMenu().findItem(R.id.menu_stop_reviewing_changes_and_view_full_album).setVisible(true);
+            menu.getMenu().findItem(R.id.menu_apply_pending_changes).setVisible(true);
         } else {
             // Use default view options
         }

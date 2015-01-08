@@ -80,4 +80,10 @@ public class Picture {
         final boolean noCompress = (compressionLevel == 0) || (compressionLevel == 100);
         return !noCompress;
     }
+
+    boolean hasPendingOperation() {
+        if (isMarkedForDeletion()) return true;
+        if (isMarkedForCompression()) return true;
+        return false;
+    }
 }

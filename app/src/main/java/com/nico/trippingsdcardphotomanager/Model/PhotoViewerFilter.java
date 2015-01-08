@@ -5,6 +5,11 @@ public interface PhotoViewerFilter {
     public void moveBackwards(Album album);
     public void resetPosition(Album album);
 
+    public interface FilterCallback {
+        // Triggered when all pics have been filtered and it's impossible to display anything
+        void onAllPicsFilteredOut();
+    }
+
     public static class NoFiltering implements PhotoViewerFilter {
         @Override
         public void moveForward(Album album) {
@@ -22,15 +27,10 @@ public interface PhotoViewerFilter {
         }
     }
 
-    public static class OnlyMarkedForDeletion implements PhotoViewerFilter {
-        public interface FilterCallback {
-            // Triggered when all pics have been filtered and it's impossible to display anything
-            void onNoPicsMarkedForDelete();
-        }
-
+    public static class OnlyWithPendingOps implements PhotoViewerFilter {
         private final FilterCallback cb;
 
-        public OnlyMarkedForDeletion(FilterCallback cb) {
+        public OnlyWithPendingOps(FilterCallback cb) {
             this.cb = cb;
         }
 
@@ -40,11 +40,11 @@ public interface PhotoViewerFilter {
             album.moveForward();
 
             int startPos = album.getCurrentPosition();
-            while (!album.getCurrentPicture().isMarkedForDeletion())
+            while (!album.getCurrentPicture().hasPendingOperation())
             {
                 album.moveForward();
                 if (startPos == album.getCurrentPosition()) {
-                    cb.onNoPicsMarkedForDelete();
+                    cb.onAllPicsFilteredOut();
                     break;
                 }
             }
@@ -56,11 +56,11 @@ public interface PhotoViewerFilter {
             album.moveBackwards();
 
             int startPos = album.getCurrentPosition();
-            while (!album.getCurrentPicture().isMarkedForDeletion())
+            while (!album.getCurrentPicture().hasPendingOperation())
             {
                 album.moveBackwards();
                 if (startPos == album.getCurrentPosition()) {
-                    cb.onNoPicsMarkedForDelete();
+                    cb.onAllPicsFilteredOut();
                     break;
                 }
             }
@@ -70,7 +70,7 @@ public interface PhotoViewerFilter {
         public void resetPosition(Album album) {
             if (album.getSize() == 0) return;
             album.resetPosition();
-            if (!album.getCurrentPicture().isMarkedForDeletion()) {
+            if (!album.getCurrentPicture().hasPendingOperation()) {
                 album.moveForward();
             }
         }
