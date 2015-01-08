@@ -1,0 +1,33 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="right">
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wPhotoActions_MarkForDelete"
+        android:contentDescription="@string/description_mark_for_deletion"
+        android:src="@android:drawable/ic_delete"
+        android:clickable="true" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wPhotoActions_MarkForCompress"
+        android:contentDescription="@string/description_mark_for_compression"
+        android:src="@drawable/ic_compress"
+        android:clickable="true"
+        android:cropToPadding="false" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wPhotoActions_OpenFullImage"
+        android:src="@android:drawable/ic_menu_zoom"
+        android:clickable="true"
+        android:contentDescription="@string/alt_text_open_full_img" />
+
+</LinearLayout>

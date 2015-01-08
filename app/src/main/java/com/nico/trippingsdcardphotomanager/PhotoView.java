@@ -37,6 +37,7 @@ public class PhotoView extends FragmentActivity implements
 
     private PhotoViewerFilter photoFilter;
     private PhotoViewFragment photoViewer;
+    private PhotoActionsFragment photoActionsBar;
     private Album album;
     private GestureDetectorCompat mDetector;
 
@@ -47,10 +48,8 @@ public class PhotoView extends FragmentActivity implements
 
         mDetector = new GestureDetectorCompat(this, this);
         photoViewer = (PhotoViewFragment) getSupportFragmentManager().findFragmentById(R.id.wPhotoViewerFragment);
+        photoActionsBar = (PhotoActionsFragment) getSupportFragmentManager().findFragmentById(R.id.wPhotoActionsFragment);
         photoFilter = new PhotoViewerFilter.NoFiltering();
-
-        findViewById(R.id.wMarkForDelete).setOnClickListener(this);
-        findViewById(R.id.wMarkForCompression).setOnClickListener(this);
 
         String path = getIntent().getStringExtra(ACTIVITY_PARAM_SELECTED_PATH);
         album = new Album(path);
@@ -58,10 +57,7 @@ public class PhotoView extends FragmentActivity implements
             Log.i(PhotoView.class.getName(), "Received empty album " + album.getPath());
 
             findViewById(R.id.wEmptyAlbum_SelectNewDir).setVisibility(View.VISIBLE);
-            // TODO: create a "disableAlbum" method
-            findViewById(R.id.wPictureStats).setVisibility(View.INVISIBLE);
-            findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
-            findViewById(R.id.wMarkForCompression).setVisibility(View.INVISIBLE);
+            findViewById(R.id.wPhotoActionsFragment).setVisibility(View.GONE);
             photoViewer.showPhotoViewer_ForEmptyAlbum();
             setStatusMessage(getResources().getString(R.string.status_album_is_empty));
 
@@ -76,8 +72,8 @@ public class PhotoView extends FragmentActivity implements
     public void showCurrentPicture() {
         photoViewer.showPicture(album.getCurrentPicture());
         setStatusMessage_CurrentPic();
-        updateMarkForDeleteBtn(album.getCurrentPicture());
-        updateMarkForCompressBtn(album.getCurrentPicture());
+        photoActionsBar.updateGUIFor(album.getCurrentPicture());
+        findViewById(R.id.wPhotoActionsFragment).setVisibility(View.VISIBLE);
     }
 
     private void setStatusMessage_CurrentPic() {
@@ -102,54 +98,16 @@ public class PhotoView extends FragmentActivity implements
         startActivity(new Intent(this, DirSelect.class));
     }
 
-    @Override
-    public void markForDeletionRequested() {
-        album.getCurrentPicture().toggleDeletionFlag();
-        updateMarkForDeleteBtn(album.getCurrentPicture());
-    }
-
-    private void updateMarkForDeleteBtn(Picture pic) {
-        ImageButton btn = (ImageButton) findViewById(R.id.wMarkForDelete);
-
-        if (pic.isMarkedForDeletion()) {
-            btn.setBackgroundResource(android.R.drawable.arrow_down_float);
-        } else {
-            btn.setBackgroundResource(android.R.drawable.sym_def_app_icon);
-        }
-
-        btn.setVisibility(View.VISIBLE);
-    }
-
-    public void updateMarkForCompressBtn(Picture pic) {
-        ImageButton btn = (ImageButton)findViewById(R.id.wMarkForCompression);
-
-        if (pic.isMarkedForDeletion()) {
-            btn.setBackgroundResource(R.drawable.ic_marked_for_delete);
-        } else {
-            btn.setBackgroundResource(android.R.drawable.ic_menu_delete);
-        }
-
-        btn.setVisibility(View.VISIBLE);
-    }
-
     // Called when applying a OnlyMarkedForDelete filter and there are no pictures to show
     @Override
     public void onNoPicsMarkedForDelete() {
         photoViewer.setAlbum_AllPicturesFiltered();
-        findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
-        findViewById(R.id.wMarkForCompression).setVisibility(View.INVISIBLE);
+        findViewById(R.id.wPhotoActionsFragment).setVisibility(View.GONE);
         setStatusMessage(getResources().getString(R.string.status_album_has_no_pictures_to_show));
 
         CharSequence msg = getResources().getString(R.string.status_no_pictures_marked_for_deletion);
         Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
         toast.show();
-    }
-
-    public void openFullImage(View view) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse("file://" + album.getCurrentPicture().getFullPath()), "image/*");
-        startActivity(intent);
     }
 
     public void mogrifyImg(View view) {
@@ -270,12 +228,6 @@ public class PhotoView extends FragmentActivity implements
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.wMarkForDelete:
-                markForDeletionRequested();
-                break;
-            case R.id.wMarkForCompression:
-                // TODO
-                break;
             case R.id.wPictureStats:
                 // TODO: minimize stats
                 break;
@@ -299,7 +251,7 @@ public class PhotoView extends FragmentActivity implements
             public void onClick(DialogInterface dialog, int which) {
                 try {
                     int num = Integer.parseInt(input.getText().toString());
-                    album.jumpTo(num-1);
+                    album.jumpTo(num - 1);
                     showCurrentPicture();
 
                     // Trigger a new cache warm-up at the new position

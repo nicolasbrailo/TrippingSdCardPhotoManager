@@ -23,7 +23,6 @@ public class PhotoViewFragment extends Fragment implements
 
     public interface AlbumContainerActivity {
         public Album getAlbum();
-        public void markForDeletionRequested();
     }
 
     /**********************************************************************************************/
