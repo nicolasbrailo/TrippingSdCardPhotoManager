@@ -13,10 +13,12 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.PhotoViewerFilter;
+import com.nico.trippingsdcardphotomanager.Model.Picture;
 import com.nico.trippingsdcardphotomanager.PictureMogrifier.PictureMogrifier;
 
 
@@ -51,13 +53,34 @@ public class PhotoView extends FragmentActivity implements
 
             findViewById(R.id.wEmptyAlbum_SelectNewDir).setVisibility(View.VISIBLE);
             photoViewer.showPhotoViewer_ForEmptyAlbum();
+            setStatusMessage(getResources().getString(R.string.status_album_is_empty));
 
         } else {
             Log.i(PhotoView.class.getName(), "Opening album " + album.getPath());
             photoFilter.resetPosition(album);
             photoViewer.setPrecacheCount(DEFAULT_PRECACHE_COUNT);
-            photoViewer.showPicture(album.getCurrentPicture());
+            showCurrentPicture();
         }
+    }
+
+    public void showCurrentPicture() {
+        photoViewer.showPicture(album.getCurrentPicture());
+        setStatusMessage_CurrentPic();
+    }
+
+    private void setStatusMessage_CurrentPic() {
+        String formattedMsg = String.format(getResources().getString(R.string.status_picture_index),
+                album.getCurrentPosition() + 1,
+                album.getSize(),
+                album.getCurrentPicture().getFileName(),
+                album.getCurrentPicture().getFileSizeInMb());
+        setStatusMessage(formattedMsg);
+    }
+
+    private void setStatusMessage(String formattedMsg) {
+        TextView picStats = (TextView)findViewById(R.id.wPictureStats);
+        picStats.setText(formattedMsg);
+        picStats.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -77,6 +100,7 @@ public class PhotoView extends FragmentActivity implements
     @Override
     public void onNoPicsMarkedForDelete() {
         photoViewer.setAlbum_AllPicturesFiltered();
+        setStatusMessage(getResources().getString(R.string.status_album_has_no_pictures_to_show));
 
         CharSequence msg = getResources().getString(R.string.status_no_pictures_marked_for_deletion);
         Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
@@ -91,9 +115,8 @@ public class PhotoView extends FragmentActivity implements
     }
 
     public void mogrifyImg(View view) {
-        PictureMogrifier mogrifier = new PictureMogrifier();
         String argv[] = {"-quality", "8", album.getCurrentPicture().getFullPath()};
-        int meaning = mogrifier.mogrify(argv);
+        int meaning = PictureMogrifier.mogrify(argv);
         Log.i(PhotoView.class.getName(), "Meaning of life = " + meaning);
     }
 
@@ -103,7 +126,7 @@ public class PhotoView extends FragmentActivity implements
     private boolean applyFilter(PhotoViewerFilter filter, int stringId) {
         this.photoFilter = filter;
         photoFilter.resetPosition(album);
-        photoViewer.showPicture(album.getCurrentPicture());
+        showCurrentPicture();
 
         CharSequence msg = getResources().getString(stringId);
         Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
@@ -191,7 +214,7 @@ public class PhotoView extends FragmentActivity implements
             photoFilter.moveForward(album);
         }
 
-        photoViewer.showPicture(album.getCurrentPicture());
+        showCurrentPicture();
         return false;
     }
 

@@ -67,6 +67,7 @@ public interface PhotoViewerFilter {
         @Override
         public void resetPosition(Album album) {
             album.resetPosition();
+            // TODO: If album is empty, this will crash
             if (!album.getCurrentPicture().isMarkedForDeletion()) {
                 album.moveForward();
             }

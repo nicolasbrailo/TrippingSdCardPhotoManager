@@ -36,5 +36,6 @@
     <string name="title_jump_to_pic">Jump to picture</string>
     <string name="alt_text_open_menu">Open application menu</string>
     <string name="alt_text_open_full_img">View full picture</string>
+    <string name="description_mark_for_compression">Compress this image to save space</string>
 
 </resources>

@@ -51,7 +51,7 @@ public class PhotoViewFragment extends Fragment implements
                              Bundle savedInstanceState) {
         View fragView = inflater.inflate(R.layout.fragment_photo_view, container, false);
         fragView.findViewById(R.id.wMarkForDelete).setOnClickListener(this);
-        fragView.findViewById(R.id.wPictureStats).setOnClickListener(this);
+        fragView.findViewById(R.id.wMarkForCompression).setOnClickListener(this);
         return fragView;
     }
 
@@ -84,10 +84,14 @@ public class PhotoViewFragment extends Fragment implements
             case R.id.wMarkForDelete:
                 albumHolder.markForDeletionRequested();
                 break;
+            case R.id.wMarkForCompression:
+                // TODO
+                break;
             case R.id.wPictureStats:
-                popupGotoPicture();
                 // TODO: minimize stats
                 break;
+            case R.id.wCurrentImage:    // TODO: Can I attach this even to any ctrl?
+                popupGotoPicture();
             default:
                 throw new AssertionError(PhotoView.class.getName() +
                                          " shouldn't be used as a listener for this event!");
@@ -101,9 +105,9 @@ public class PhotoViewFragment extends Fragment implements
     private boolean showNoPicture = false;
 
     public void showPhotoViewer_ForEmptyAlbum() {
-        setCurrentStatusText(getResources().getString(R.string.status_album_is_empty));
         activity.findViewById(R.id.wPictureStats).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
+        activity.findViewById(R.id.wMarkForCompression).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
     }
@@ -111,37 +115,14 @@ public class PhotoViewFragment extends Fragment implements
     // Called when all the pictures in the album have been filtered out
     public void setAlbum_AllPicturesFiltered() {
         showNoPicture = true;
-        setCurrentStatusText(getResources().getString(R.string.status_album_has_no_pictures_to_show));
-        activity.findViewById(R.id.wPictureStats).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
+        activity.findViewById(R.id.wMarkForCompression).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
     }
 
     public void setAlbum_Reenabled() {
         showNoPicture = false;
-    }
-
-    private void setCurrentStatusText(String msg) {
-        TextView picStats = (TextView) activity.findViewById(R.id.wPictureStats);
-        picStats.setText(msg);
-        picStats.setVisibility(View.VISIBLE);
-
-        final ImageView overlay = (ImageView) activity.findViewById(R.id.statusOverlay);
-        overlay.setX( picStats.getX()-5 );  // Start 5 units before to get some padding
-        overlay.setY( picStats.getY()-5 );
-        overlay.setMinimumWidth( picStats.getWidth() + 5 );
-        overlay.setMinimumHeight( picStats.getHeight() + 5 );
-        overlay.setVisibility(View.VISIBLE);
-    }
-
-    private void setCurrentStatusText(Picture pic) {
-        String formattedMsg = String.format(getResources().getString(R.string.status_picture_index),
-                albumHolder.getAlbum().getCurrentPosition() + 1,
-                albumHolder.getAlbum().getSize(),
-                pic.getFileName(),
-                pic.getFileSizeInMb());
-        setCurrentStatusText(formattedMsg);
     }
 
     public void showPicture(Picture pic) {
@@ -154,6 +135,7 @@ public class PhotoViewFragment extends Fragment implements
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.VISIBLE);
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
+        activity.findViewById(R.id.wMarkForCompression).setVisibility(View.INVISIBLE);
 
         loadingPicture = true;
         if (pic.needsResizing()) {
@@ -170,8 +152,10 @@ public class PhotoViewFragment extends Fragment implements
         loadingPicture = false;
 
         if (!pic.isValid()) {
+            /* TODO: NOtify parent activity
             final String msg = getResources().getString(R.string.status_invalid_picture);
             setCurrentStatusText(String.format(msg, pic.getPicture().getFileName()));
+            */
             activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
             Log.i(PhotoView.class.getName(), "Couldn't render image " + pic.getPicture().getFileName());
             return;
@@ -188,8 +172,8 @@ public class PhotoViewFragment extends Fragment implements
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.VISIBLE);
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
 
-        setCurrentStatusText(pic.getPicture());
         updateMarkForDeleteBtn(pic.getPicture());
+        updateMarkForCompressBtn(pic.getPicture());
 
         Log.i(PhotoView.class.getName(), "Loaded " + pic.getPicture().getFileName());
         precacheNextPicture(preCacheCount);
@@ -216,13 +200,25 @@ public class PhotoViewFragment extends Fragment implements
         }).execute(albumHolder.getAlbum().getPictureAtRelativePosition(count));
     }
 
-    public void updateMarkForDeleteBtn(Picture pic) {
-        ImageButton btn = (ImageButton) activity.findViewById(R.id.wMarkForDelete);
+    public void updateMarkForCompressBtn(Picture pic) {
+        ImageButton btn = (ImageButton) activity.findViewById(R.id.wMarkForCompression);
 
         if (pic.isMarkedForDeletion()) {
             btn.setBackgroundResource(R.drawable.ic_marked_for_delete);
         } else {
             btn.setBackgroundResource(android.R.drawable.ic_menu_delete);
+        }
+
+        btn.setVisibility(View.VISIBLE);
+    }
+
+    public void updateMarkForDeleteBtn(Picture pic) {
+        ImageButton btn = (ImageButton) activity.findViewById(R.id.wMarkForDelete);
+
+        if (pic.isMarkedForDeletion()) {
+            btn.setBackgroundResource(android.R.drawable.arrow_down_float);
+        } else {
+            btn.setBackgroundResource(android.R.drawable.sym_def_app_icon);
         }
 
         btn.setVisibility(View.VISIBLE);
