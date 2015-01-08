@@ -10,13 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.nico.trippingsdcardphotomanager.Model.AlbumContainer;
 import com.nico.trippingsdcardphotomanager.Model.Picture;
 
 public class PhotoActionsFragment extends Fragment implements View.OnClickListener {
 
     private Activity activity;
-    // TODO: Create a public interface for the albumcontainerthingy
-    private PhotoViewFragment.AlbumContainerActivity albumHolder;
+    private AlbumContainer albumHolder;
 
 
     /**********************************************************************************************/
@@ -31,7 +31,7 @@ public class PhotoActionsFragment extends Fragment implements View.OnClickListen
 
         this.activity = activity;
         try {
-            albumHolder = (PhotoViewFragment.AlbumContainerActivity) activity;
+            albumHolder = (AlbumContainer) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement AlbumContainerActivity");

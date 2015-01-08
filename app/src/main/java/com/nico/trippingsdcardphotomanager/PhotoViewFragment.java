@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
+import com.nico.trippingsdcardphotomanager.Model.AlbumContainer;
 import com.nico.trippingsdcardphotomanager.Model.Picture;
 import com.nico.trippingsdcardphotomanager.Model.ScaledDownPicture;
 import com.nico.trippingsdcardphotomanager.Services.PictureResizer;
@@ -18,11 +19,13 @@ public class PhotoViewFragment extends Fragment implements
                             PictureResizer.PictureReadyCallback {
 
     private Activity activity;
-    private AlbumContainerActivity albumHolder;
+    private AlbumContainer albumHolder;
     private int preCacheCount;
+    private PhotoShownCallbacks callbacks;
 
-    public interface AlbumContainerActivity {
-        public Album getAlbum();
+    public interface PhotoShownCallbacks {
+        public void pictureRendered();
+        public void invalidPictureReceived();
     }
 
     /**********************************************************************************************/
@@ -49,11 +52,19 @@ public class PhotoViewFragment extends Fragment implements
         super.onAttach(activity);
 
         this.activity = activity;
+
         try {
-            albumHolder = (AlbumContainerActivity) activity;
+            albumHolder = (AlbumContainer) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement AlbumContainerActivity");
+        }
+
+        try {
+            callbacks = (PhotoShownCallbacks) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement PhotoShownCallbacks");
         }
     }
 
@@ -68,30 +79,10 @@ public class PhotoViewFragment extends Fragment implements
     /* Photo viewer interface */
     /**********************************************************************************************/
     private boolean loadingPicture = false;
-    private boolean showNoPicture = false;
-
-    public void showPhotoViewer_ForEmptyAlbum() {
-        activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
-        activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
-    }
-
-    // Called when all the pictures in the album have been filtered out
-    public void setAlbum_AllPicturesFiltered() {
-        showNoPicture = true;
-        activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
-        activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
-    }
-
-    public void setAlbum_Reenabled() {
-        showNoPicture = false;
-    }
 
     public void showPicture(Picture pic) {
         // We're loading a picture, a second load event can't be processed
         if (loadingPicture) return;
-
-        // The activity has temporarily disabled displaying pictures
-        if (showNoPicture) return;
 
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.VISIBLE);
 
@@ -110,10 +101,7 @@ public class PhotoViewFragment extends Fragment implements
         loadingPicture = false;
 
         if (!pic.isValid()) {
-            /* TODO: NOtify parent activity
-            final String msg = getResources().getString(R.string.status_invalid_picture);
-            setCurrentStatusText(String.format(msg, pic.getPicture().getFileName()));
-            */
+            callbacks.invalidPictureReceived();
             activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
             Log.i(PhotoView.class.getName(), "Couldn't render image " + pic.getPicture().getFileName());
             return;
@@ -129,6 +117,7 @@ public class PhotoViewFragment extends Fragment implements
 
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.VISIBLE);
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
+        callbacks.pictureRendered();
 
         Log.i(PhotoView.class.getName(), "Loaded " + pic.getPicture().getFileName());
         precacheNextPicture(preCacheCount);

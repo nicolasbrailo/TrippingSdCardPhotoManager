@@ -3,7 +3,6 @@ package com.nico.trippingsdcardphotomanager;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GestureDetectorCompat;
 import android.os.Bundle;
@@ -14,21 +13,21 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
+import com.nico.trippingsdcardphotomanager.Model.AlbumContainer;
 import com.nico.trippingsdcardphotomanager.Model.PhotoViewerFilter;
-import com.nico.trippingsdcardphotomanager.Model.Picture;
 import com.nico.trippingsdcardphotomanager.PictureMogrifier.PictureMogrifier;
 
 
 public class PhotoView extends FragmentActivity implements
                         GestureDetector.OnGestureListener,
                         PopupMenu.OnMenuItemClickListener,
-                        PhotoViewFragment.AlbumContainerActivity,
+                        PhotoViewFragment.PhotoShownCallbacks,
+                        AlbumContainer,
                         PhotoViewerFilter.OnlyMarkedForDeletion.FilterCallback, View.OnClickListener {
 
     public static final String ACTIVITY_PARAM_SELECTED_PATH = "com.nico.trippingsdcardphotomanager.ALBUM_PATH";
@@ -58,7 +57,7 @@ public class PhotoView extends FragmentActivity implements
 
             findViewById(R.id.wEmptyAlbum_SelectNewDir).setVisibility(View.VISIBLE);
             findViewById(R.id.wPhotoActionsFragment).setVisibility(View.GONE);
-            photoViewer.showPhotoViewer_ForEmptyAlbum();
+            findViewById(R.id.wPhotoViewerFragment).setVisibility(View.INVISIBLE);
             setStatusMessage(getResources().getString(R.string.status_album_is_empty));
 
         } else {
@@ -92,6 +91,17 @@ public class PhotoView extends FragmentActivity implements
     }
 
     @Override
+    public void pictureRendered() {
+
+    }
+
+    @Override
+    public void invalidPictureReceived() {
+        final String msg = getResources().getString(R.string.status_invalid_picture);
+        setStatusMessage(String.format(msg, album.getCurrentPicture().getFileName()));
+    }
+
+    @Override
     public Album getAlbum() { return this.album; }
 
     public void onSelectNewDir(View view) {
@@ -101,7 +111,7 @@ public class PhotoView extends FragmentActivity implements
     // Called when applying a OnlyMarkedForDelete filter and there are no pictures to show
     @Override
     public void onNoPicsMarkedForDelete() {
-        photoViewer.setAlbum_AllPicturesFiltered();
+        findViewById(R.id.wPhotoViewerFragment).setVisibility(View.INVISIBLE);
         findViewById(R.id.wPhotoActionsFragment).setVisibility(View.GONE);
         setStatusMessage(getResources().getString(R.string.status_album_has_no_pictures_to_show));
 
@@ -140,7 +150,6 @@ public class PhotoView extends FragmentActivity implements
                         R.string.status_reviewing_marked_for_delete);
 
             case R.id.stop_reviewing_images_marked_for_deletion:
-                photoViewer.setAlbum_Reenabled();
                 return applyFilter(new PhotoViewerFilter.NoFiltering(),
                         R.string.status_viewing_full_album);
 
