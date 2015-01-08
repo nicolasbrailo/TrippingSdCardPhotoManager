@@ -26,23 +26,4 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/wMarkForDelete"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:contentDescription="@string/description_mark_for_deletion"
-        android:visibility="invisible" />
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/wMarkForCompression"
-        android:contentDescription="@string/description_mark_for_compression"
-        android:visibility="invisible"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/wMarkForDelete"
-        android:layout_toStartOf="@+id/wMarkForDelete" />
-
 </RelativeLayout>

@@ -7,11 +7,14 @@ import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GestureDetectorCompat;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +29,7 @@ public class PhotoView extends FragmentActivity implements
                         GestureDetector.OnGestureListener,
                         PopupMenu.OnMenuItemClickListener,
                         PhotoViewFragment.AlbumContainerActivity,
-                        PhotoViewerFilter.OnlyMarkedForDeletion.FilterCallback {
+                        PhotoViewerFilter.OnlyMarkedForDeletion.FilterCallback, View.OnClickListener {
 
     public static final String ACTIVITY_PARAM_SELECTED_PATH = "com.nico.trippingsdcardphotomanager.ALBUM_PATH";
     private static final float SWIPE_THRESHOLD_VELOCITY = 100;
@@ -46,12 +49,19 @@ public class PhotoView extends FragmentActivity implements
         photoViewer = (PhotoViewFragment) getSupportFragmentManager().findFragmentById(R.id.wPhotoViewerFragment);
         photoFilter = new PhotoViewerFilter.NoFiltering();
 
+        findViewById(R.id.wMarkForDelete).setOnClickListener(this);
+        findViewById(R.id.wMarkForCompression).setOnClickListener(this);
+
         String path = getIntent().getStringExtra(ACTIVITY_PARAM_SELECTED_PATH);
         album = new Album(path);
         if (album.isEmpty()) {
             Log.i(PhotoView.class.getName(), "Received empty album " + album.getPath());
 
             findViewById(R.id.wEmptyAlbum_SelectNewDir).setVisibility(View.VISIBLE);
+            // TODO: create a "disableAlbum" method
+            findViewById(R.id.wPictureStats).setVisibility(View.INVISIBLE);
+            findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
+            findViewById(R.id.wMarkForCompression).setVisibility(View.INVISIBLE);
             photoViewer.showPhotoViewer_ForEmptyAlbum();
             setStatusMessage(getResources().getString(R.string.status_album_is_empty));
 
@@ -66,6 +76,8 @@ public class PhotoView extends FragmentActivity implements
     public void showCurrentPicture() {
         photoViewer.showPicture(album.getCurrentPicture());
         setStatusMessage_CurrentPic();
+        updateMarkForDeleteBtn(album.getCurrentPicture());
+        updateMarkForCompressBtn(album.getCurrentPicture());
     }
 
     private void setStatusMessage_CurrentPic() {
@@ -93,13 +105,39 @@ public class PhotoView extends FragmentActivity implements
     @Override
     public void markForDeletionRequested() {
         album.getCurrentPicture().toggleDeletionFlag();
-        photoViewer.updateMarkForDeleteBtn(album.getCurrentPicture());
+        updateMarkForDeleteBtn(album.getCurrentPicture());
+    }
+
+    private void updateMarkForDeleteBtn(Picture pic) {
+        ImageButton btn = (ImageButton) findViewById(R.id.wMarkForDelete);
+
+        if (pic.isMarkedForDeletion()) {
+            btn.setBackgroundResource(android.R.drawable.arrow_down_float);
+        } else {
+            btn.setBackgroundResource(android.R.drawable.sym_def_app_icon);
+        }
+
+        btn.setVisibility(View.VISIBLE);
+    }
+
+    public void updateMarkForCompressBtn(Picture pic) {
+        ImageButton btn = (ImageButton)findViewById(R.id.wMarkForCompression);
+
+        if (pic.isMarkedForDeletion()) {
+            btn.setBackgroundResource(R.drawable.ic_marked_for_delete);
+        } else {
+            btn.setBackgroundResource(android.R.drawable.ic_menu_delete);
+        }
+
+        btn.setVisibility(View.VISIBLE);
     }
 
     // Called when applying a OnlyMarkedForDelete filter and there are no pictures to show
     @Override
     public void onNoPicsMarkedForDelete() {
         photoViewer.setAlbum_AllPicturesFiltered();
+        findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
+        findViewById(R.id.wMarkForCompression).setVisibility(View.INVISIBLE);
         setStatusMessage(getResources().getString(R.string.status_album_has_no_pictures_to_show));
 
         CharSequence msg = getResources().getString(R.string.status_no_pictures_marked_for_deletion);
@@ -169,7 +207,7 @@ public class PhotoView extends FragmentActivity implements
                 return true;
 
             case R.id.menu_goto_picture:
-                photoViewer.popupGotoPicture();
+                popupGotoPicture();
                 return true;
 
             case R.id.choose_another_album:
@@ -224,4 +262,62 @@ public class PhotoView extends FragmentActivity implements
     @Override public boolean onSingleTapUp(MotionEvent e) { return false; }
     @Override public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) { return false; }
     @Override public void onLongPress(MotionEvent e) { }
+
+
+    /**********************************************************************************************/
+    /* Integration with UI elements */
+    /**********************************************************************************************/
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.wMarkForDelete:
+                markForDeletionRequested();
+                break;
+            case R.id.wMarkForCompression:
+                // TODO
+                break;
+            case R.id.wPictureStats:
+                // TODO: minimize stats
+                break;
+            case R.id.wCurrentImage:    // TODO: Can I attach this even to any ctrl?
+                popupGotoPicture();
+            default:
+                throw new AssertionError(PhotoView.class.getName() +
+                        " shouldn't be used as a listener for this event!");
+        }
+    }
+
+    public void popupGotoPicture() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.title_jump_to_pic));
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    int num = Integer.parseInt(input.getText().toString());
+                    album.jumpTo(num-1);
+                    showCurrentPicture();
+
+                    // Trigger a new cache warm-up at the new position
+                    photoViewer.warmUpCache();
+
+                } catch (NumberFormatException ex) {
+                    Log.e(PhotoViewFragment.class.getName(), "GOTO Pic: number format is wrong.");
+                }
+            }
+        });
+
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
 }

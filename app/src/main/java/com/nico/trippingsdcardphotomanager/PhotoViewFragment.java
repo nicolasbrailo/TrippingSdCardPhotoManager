@@ -1,19 +1,13 @@
 package com.nico.trippingsdcardphotomanager;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.Picture;
@@ -21,8 +15,7 @@ import com.nico.trippingsdcardphotomanager.Model.ScaledDownPicture;
 import com.nico.trippingsdcardphotomanager.Services.PictureResizer;
 
 public class PhotoViewFragment extends Fragment implements
-                            PictureResizer.PictureReadyCallback,
-                            View.OnClickListener {
+                            PictureResizer.PictureReadyCallback {
 
     private Activity activity;
     private AlbumContainerActivity albumHolder;
@@ -49,10 +42,7 @@ public class PhotoViewFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View fragView = inflater.inflate(R.layout.fragment_photo_view, container, false);
-        fragView.findViewById(R.id.wMarkForDelete).setOnClickListener(this);
-        fragView.findViewById(R.id.wMarkForCompression).setOnClickListener(this);
-        return fragView;
+        return inflater.inflate(R.layout.fragment_photo_view, container, false);
     }
 
     @Override
@@ -64,7 +54,7 @@ public class PhotoViewFragment extends Fragment implements
             albumHolder = (AlbumContainerActivity) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement AlbumContainerActivity");
         }
     }
 
@@ -76,38 +66,12 @@ public class PhotoViewFragment extends Fragment implements
 
 
     /**********************************************************************************************/
-    /* Integration with UI elements */
-    /**********************************************************************************************/
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.wMarkForDelete:
-                albumHolder.markForDeletionRequested();
-                break;
-            case R.id.wMarkForCompression:
-                // TODO
-                break;
-            case R.id.wPictureStats:
-                // TODO: minimize stats
-                break;
-            case R.id.wCurrentImage:    // TODO: Can I attach this even to any ctrl?
-                popupGotoPicture();
-            default:
-                throw new AssertionError(PhotoView.class.getName() +
-                                         " shouldn't be used as a listener for this event!");
-        }
-    }
-
-    /**********************************************************************************************/
     /* Photo viewer interface */
     /**********************************************************************************************/
     private boolean loadingPicture = false;
     private boolean showNoPicture = false;
 
     public void showPhotoViewer_ForEmptyAlbum() {
-        activity.findViewById(R.id.wPictureStats).setVisibility(View.INVISIBLE);
-        activity.findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
-        activity.findViewById(R.id.wMarkForCompression).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
     }
@@ -115,8 +79,6 @@ public class PhotoViewFragment extends Fragment implements
     // Called when all the pictures in the album have been filtered out
     public void setAlbum_AllPicturesFiltered() {
         showNoPicture = true;
-        activity.findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
-        activity.findViewById(R.id.wMarkForCompression).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
     }
@@ -133,9 +95,6 @@ public class PhotoViewFragment extends Fragment implements
         if (showNoPicture) return;
 
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.VISIBLE);
-        activity.findViewById(R.id.wCurrentImage).setVisibility(View.INVISIBLE);
-        activity.findViewById(R.id.wMarkForDelete).setVisibility(View.INVISIBLE);
-        activity.findViewById(R.id.wMarkForCompression).setVisibility(View.INVISIBLE);
 
         loadingPicture = true;
         if (pic.needsResizing()) {
@@ -172,9 +131,6 @@ public class PhotoViewFragment extends Fragment implements
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.VISIBLE);
         activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
 
-        updateMarkForDeleteBtn(pic.getPicture());
-        updateMarkForCompressBtn(pic.getPicture());
-
         Log.i(PhotoView.class.getName(), "Loaded " + pic.getPicture().getFileName());
         precacheNextPicture(preCacheCount);
     }
@@ -189,6 +145,10 @@ public class PhotoViewFragment extends Fragment implements
         }
     }
 
+    public void warmUpCache() {
+        setPrecacheCount(preCacheCount);
+    }
+
     private void precacheNextPicture(int count) {
         Log.i(PhotoViewFragment.class.getName(), "Precaching  "+count);
         if (count <= 0) return;
@@ -198,63 +158,5 @@ public class PhotoViewFragment extends Fragment implements
                 Log.i(PhotoViewFragment.class.getName(), "Precached "+pic.getPicture().getFileName());
             }
         }).execute(albumHolder.getAlbum().getPictureAtRelativePosition(count));
-    }
-
-    public void updateMarkForCompressBtn(Picture pic) {
-        ImageButton btn = (ImageButton) activity.findViewById(R.id.wMarkForCompression);
-
-        if (pic.isMarkedForDeletion()) {
-            btn.setBackgroundResource(R.drawable.ic_marked_for_delete);
-        } else {
-            btn.setBackgroundResource(android.R.drawable.ic_menu_delete);
-        }
-
-        btn.setVisibility(View.VISIBLE);
-    }
-
-    public void updateMarkForDeleteBtn(Picture pic) {
-        ImageButton btn = (ImageButton) activity.findViewById(R.id.wMarkForDelete);
-
-        if (pic.isMarkedForDeletion()) {
-            btn.setBackgroundResource(android.R.drawable.arrow_down_float);
-        } else {
-            btn.setBackgroundResource(android.R.drawable.sym_def_app_icon);
-        }
-
-        btn.setVisibility(View.VISIBLE);
-    }
-
-    public void popupGotoPicture() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle(activity.getString(R.string.title_jump_to_pic));
-        final EditText input = new EditText(activity);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        builder.setView(input);
-
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    int num = Integer.parseInt(input.getText().toString());
-                    albumHolder.getAlbum().jumpTo(num-1);
-                    showPicture(albumHolder.getAlbum().getCurrentPicture());
-
-                    // Trigger a new cache warm-up at the new position
-                    setPrecacheCount(preCacheCount);
-
-                } catch (NumberFormatException ex) {
-                    Log.e(PhotoViewFragment.class.getName(), "GOTO Pic: number format is wrong.");
-                }
-            }
-        });
-
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
     }
 }
