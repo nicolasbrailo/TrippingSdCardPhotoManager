@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Album {
-    private final double CACHE_USAGE_MULTIPLIER = 0.2;
+    private final double CACHE_USAGE_MULTIPLIER = 0.4;
 
     private LruCache<String,ScaledDownPicture> pictureCache;
     private List<Picture> pics;

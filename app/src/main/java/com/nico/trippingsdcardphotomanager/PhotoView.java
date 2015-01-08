@@ -142,6 +142,7 @@ public class PhotoView extends FragmentActivity implements
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
+        // TODO: Remove menu when no pics in the album
         switch (item.getItemId()) {
             case R.id.review_images_marked_for_deletion:
                 // TODO: For some reason, if calling this with no pics marked for del then the curr

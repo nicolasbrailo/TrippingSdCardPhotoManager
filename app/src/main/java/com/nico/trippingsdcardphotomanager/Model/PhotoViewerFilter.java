@@ -36,6 +36,7 @@ public interface PhotoViewerFilter {
 
         @Override
         public void moveForward(Album album) {
+            if (album.getSize() == 0) return;
             album.moveForward();
 
             int startPos = album.getCurrentPosition();
@@ -51,6 +52,7 @@ public interface PhotoViewerFilter {
 
         @Override
         public void moveBackwards(Album album) {
+            if (album.getSize() == 0) return;
             album.moveBackwards();
 
             int startPos = album.getCurrentPosition();
@@ -66,8 +68,8 @@ public interface PhotoViewerFilter {
 
         @Override
         public void resetPosition(Album album) {
+            if (album.getSize() == 0) return;
             album.resetPosition();
-            // TODO: If album is empty, this will crash
             if (!album.getCurrentPicture().isMarkedForDeletion()) {
                 album.moveForward();
             }
