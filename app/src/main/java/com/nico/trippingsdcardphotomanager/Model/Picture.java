@@ -10,6 +10,7 @@ public class Picture {
     private final String path;
     private final String fname;
     private boolean markedForDeletion = false;
+    private int compressionLevel = 0;
 
     public Picture(LruCache<String, ScaledDownPicture> pictureCache, final String path, final String fname) {
         this.pictureCache = pictureCache;
@@ -52,5 +53,31 @@ public class Picture {
 
     public float getFileSizeInMb() {
         return new File(path).length() / 1024f / 1024f;
+    }
+
+    public int getCompressionLevel() {
+        return compressionLevel;
+    }
+
+    public void cycleCompressionLevel() {
+        switch (compressionLevel) {
+            case 0:
+                compressionLevel = 90;
+                break;
+            case 90:
+                compressionLevel = 80;
+                break;
+            case 80:
+                compressionLevel = 70;
+                break;
+            case 70:
+                compressionLevel = 0;
+                break;
+        }
+    }
+
+    public boolean isMarkedForCompression() {
+        final boolean noCompress = (compressionLevel == 0) || (compressionLevel == 100);
+        return !noCompress;
     }
 }

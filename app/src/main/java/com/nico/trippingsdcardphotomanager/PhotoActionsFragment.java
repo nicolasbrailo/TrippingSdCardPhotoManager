@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.nico.trippingsdcardphotomanager.Model.AlbumContainer;
@@ -86,8 +87,8 @@ public class PhotoActionsFragment extends Fragment implements View.OnClickListen
     }
 
     private void onMarkForCompress() {
-        // TODO
-        updateMarkForDeleteBtn(albumHolder.getAlbum().getCurrentPicture());
+        albumHolder.getAlbum().getCurrentPicture().cycleCompressionLevel();
+        updateMarkForCompressBtn(albumHolder.getAlbum().getCurrentPicture());
     }
 
     /**********************************************************************************************/
@@ -99,21 +100,21 @@ public class PhotoActionsFragment extends Fragment implements View.OnClickListen
     }
 
     private void updateMarkForDeleteBtn(Picture pic) {
-        setButtonStatus((ImageButton) activity.findViewById(R.id.wPhotoActions_MarkForDelete),
-                pic.isMarkedForDeletion());
-    }
-
-    private void updateMarkForCompressBtn(Picture pic) {
-        setButtonStatus((ImageButton) activity.findViewById(R.id.wPhotoActions_MarkForCompress),
-                pic.isMarkedForDeletion());
-    }
-
-    private void setButtonStatus(ImageButton btn, boolean enabled) {
-        if (enabled) {
+        ImageButton btn = (ImageButton) activity.findViewById(R.id.wPhotoActions_MarkForDelete);
+        if (pic.isMarkedForDeletion()) {
             btn.setColorFilter(null);
         } else {
             final int greyedOut = activity.getResources().getColor(android.R.color.darker_gray);
             btn.setColorFilter(greyedOut);
+        }
+    }
+
+    private void updateMarkForCompressBtn(Picture pic) {
+        final Button btn = (Button) activity.findViewById(R.id.wPhotoActions_MarkForCompress);
+        if (pic.isMarkedForCompression()) {
+            btn.setText("" + pic.getCompressionLevel() + "%");
+        } else {
+            btn.setText("");
         }
     }
 }
