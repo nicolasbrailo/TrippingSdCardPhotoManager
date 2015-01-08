@@ -25,8 +25,15 @@ public class ScaledDownPicture {
         final BitmapFactory.Options imgInfo = getImageInfo(fp.getAbsolutePath());
         imgInfo.inSampleSize = calculateScaleDownFactor(windowManager, imgInfo);
         final Bitmap bm = BitmapFactory.decodeFile(fp.getAbsolutePath(), imgInfo);
-        int nh = (int) ( bm.getHeight() * (512.0 / bm.getWidth()) );
-        scaledPicture = Bitmap.createScaledBitmap(bm, 512, nh, false);
+
+        if (bm != null) {
+            int nh = (int) ( bm.getHeight() * (512.0 / bm.getWidth()) );
+            scaledPicture = Bitmap.createScaledBitmap(bm, 512, nh, false);
+        } else {
+            // TODO: If not a valid picture bm will be null
+            int nh = (int) ( bm.getHeight() * (512.0 / bm.getWidth()) );
+            scaledPicture = Bitmap.createScaledBitmap(bm, 512, nh, false);
+        }
     }
 
     public Picture getPicture() {
