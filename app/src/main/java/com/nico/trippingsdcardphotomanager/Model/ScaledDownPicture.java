@@ -12,6 +12,7 @@ public class ScaledDownPicture {
 
     private final Bitmap scaledPicture;
     private final Picture picture;
+    private final boolean isAValidPicture;
 
     ScaledDownPicture(WindowManager windowManager, Picture pic, String path) {
         this.picture = pic;
@@ -19,6 +20,7 @@ public class ScaledDownPicture {
         File fp = new File(path);
         if (!fp.exists()) {
             scaledPicture = null;
+            isAValidPicture = false;
             return;
         }
 
@@ -29,10 +31,10 @@ public class ScaledDownPicture {
         if (bm != null) {
             int nh = (int) ( bm.getHeight() * (512.0 / bm.getWidth()) );
             scaledPicture = Bitmap.createScaledBitmap(bm, 512, nh, false);
+            isAValidPicture = true;
         } else {
-            // TODO: If not a valid picture bm will be null
-            int nh = (int) ( bm.getHeight() * (512.0 / bm.getWidth()) );
-            scaledPicture = Bitmap.createScaledBitmap(bm, 512, nh, false);
+            isAValidPicture = false;
+            scaledPicture = null;
         }
     }
 
@@ -40,12 +42,17 @@ public class ScaledDownPicture {
         return picture;
     }
 
-    public boolean isValid() {
+    public boolean wasRescaled() {
         return (scaledPicture != null);
     }
 
-    public Bitmap getBitmap() throws UncheckedInvalidImage {
-        if (!isValid()) throw new UncheckedInvalidImage();
+    public boolean isAValidPicture() {
+        return isAValidPicture;
+    }
+
+    public Bitmap getBitmap() throws UncheckedInvalidImage, NotAnImage {
+        if (!wasRescaled()) throw new UncheckedInvalidImage();
+        if (!isAValidPicture()) throw new NotAnImage();
         return scaledPicture;
     }
 
@@ -78,13 +85,23 @@ public class ScaledDownPicture {
         return scaleFactor;
     }
 
-    public int getByteCount() { return scaledPicture.getByteCount(); }
+    public int getByteCount() {
+        if (!isAValidPicture() || !wasRescaled()) return 0;
+        return scaledPicture.getByteCount();
+    }
 
     public static class UncheckedInvalidImage extends Throwable {
         public UncheckedInvalidImage() {}
         public String getMessage() {
             return "Trying to get the bitmap for an invalid picture. This is a programming error. "
                     + "Contact the developer of this application and tell him he sucks.";
+        }
+    }
+
+    public static class NotAnImage extends Throwable {
+        public NotAnImage() {}
+        public String getMessage() {
+            return "This file is not a valid image.";
         }
     }
 }

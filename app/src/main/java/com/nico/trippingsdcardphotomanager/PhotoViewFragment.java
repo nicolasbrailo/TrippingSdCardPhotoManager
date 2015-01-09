@@ -97,12 +97,13 @@ public class PhotoViewFragment extends Fragment implements
 
     @Override
     public void onPictureLoaded(ScaledDownPicture pic) {
+        activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
+
         if (!loadingPicture) throw new AssertionError("onPictureLoaded shouldn't be called directly.");
         loadingPicture = false;
 
-        if (!pic.isValid()) {
+        if (!pic.wasRescaled() || !pic.isAValidPicture()) {
             callbacks.invalidPictureReceived();
-            activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
             Log.i(PhotoView.class.getName(), "Couldn't render image " + pic.getPicture().getFileName());
             return;
         }
@@ -113,10 +114,11 @@ public class PhotoViewFragment extends Fragment implements
         } catch (ScaledDownPicture.UncheckedInvalidImage ex) {
             Log.e(PhotoView.class.getName(), "This shouldn't happen: " + ex.getMessage());
             ex.printStackTrace();
+        } catch (ScaledDownPicture.NotAnImage ex) {
+            Log.e(PhotoView.class.getName(), "This shouldn't happen: " + ex.getMessage());
         }
 
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.VISIBLE);
-        activity.findViewById(R.id.wCurrentImageLoading).setVisibility(View.GONE);
         callbacks.pictureRendered();
 
         Log.i(PhotoView.class.getName(), "Loaded " + pic.getPicture().getFileName());

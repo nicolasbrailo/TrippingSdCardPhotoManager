@@ -53,7 +53,7 @@ public class PhotoView extends FragmentActivity implements
 
         String path = getIntent().getStringExtra(ACTIVITY_PARAM_SELECTED_PATH);
         album = new Album(path);
-        if (album.isEmpty()) {
+        if (photoFilter.isAlbumEmpty(album)) {
             Log.i(PhotoView.class.getName(), "Received empty album " + album.getPath());
 
             findViewById(R.id.wEmptyAlbum_SelectNewDir).setVisibility(View.VISIBLE);
@@ -70,11 +70,25 @@ public class PhotoView extends FragmentActivity implements
     }
 
     public void showCurrentPicture() {
+        if (photoFilter.isAlbumEmpty(album)) return;
         photoViewer.showPicture(album.getCurrentPicture());
+    }
+
+    @Override
+    public void pictureRendered() {
+        findViewById(R.id.wPhotoActionsFragment).setVisibility(View.VISIBLE);
+        findViewById(R.id.wPhotoViewerFragment).setVisibility(View.VISIBLE);
         setStatusMessage_CurrentPic();
         photoActionsBar.updateGUIFor(album.getCurrentPicture());
-        findViewById(R.id.wPhotoActionsFragment).setVisibility(View.VISIBLE);
     }
+
+    @Override
+    public void invalidPictureReceived() {
+        findViewById(R.id.wPhotoViewerFragment).setVisibility(View.INVISIBLE);
+        final String msg = getResources().getString(R.string.status_invalid_picture);
+        setStatusMessage(String.format(msg, album.getCurrentPicture().getFileName()));
+    }
+
 
     private void setStatusMessage_CurrentPic() {
         String formattedMsg = String.format(getResources().getString(R.string.status_picture_index),
@@ -92,17 +106,6 @@ public class PhotoView extends FragmentActivity implements
     }
 
     @Override
-    public void pictureRendered() {
-
-    }
-
-    @Override
-    public void invalidPictureReceived() {
-        final String msg = getResources().getString(R.string.status_invalid_picture);
-        setStatusMessage(String.format(msg, album.getCurrentPicture().getFileName()));
-    }
-
-    @Override
     public Album getAlbum() { return this.album; }
 
     public void onSelectNewDir(View view) {
@@ -116,7 +119,7 @@ public class PhotoView extends FragmentActivity implements
         findViewById(R.id.wPhotoActionsFragment).setVisibility(View.GONE);
         setStatusMessage(getResources().getString(R.string.status_album_has_no_pictures_to_show));
 
-        CharSequence msg = getResources().getString(R.string.status_no_pictures_marked_for_deletion);
+        CharSequence msg = getResources().getString(R.string.status_no_pictures_with_pending_ops);
         Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
         toast.show();
     }
@@ -146,8 +149,6 @@ public class PhotoView extends FragmentActivity implements
         // TODO: Remove menu when no pics in the album
         switch (item.getItemId()) {
             case R.id.menu_review_pics_and_apply_changes:
-                // TODO: For some reason, if calling this with no changes pending, then the curr
-                // pic is shown anyway
                 return applyFilter(new PhotoViewerFilter.OnlyWithPendingOps(this),
                         R.string.status_reviewing_pending_ops);
 
