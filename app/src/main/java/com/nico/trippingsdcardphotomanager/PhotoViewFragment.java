@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.AlbumContainer;
 import com.nico.trippingsdcardphotomanager.Model.Picture;
 import com.nico.trippingsdcardphotomanager.Model.ScaledDownPicture;
@@ -104,7 +103,7 @@ public class PhotoViewFragment extends Fragment implements
 
         if (!pic.wasRescaled() || !pic.isAValidPicture()) {
             callbacks.invalidPictureReceived();
-            Log.i(PhotoView.class.getName(), "Couldn't render image " + pic.getPicture().getFileName());
+            Log.i(PhotoViewFragment.class.getName(), "Couldn't render image " + pic.getPicture().getFileName());
             return;
         }
 
@@ -112,16 +111,16 @@ public class PhotoViewFragment extends Fragment implements
             final ImageView wImg = (ImageView) activity.findViewById(R.id.wCurrentImage);
             wImg.setImageBitmap(pic.getBitmap());
         } catch (ScaledDownPicture.UncheckedInvalidImage ex) {
-            Log.e(PhotoView.class.getName(), "This shouldn't happen: " + ex.getMessage());
+            Log.e(PhotoViewFragment.class.getName(), "This shouldn't happen: " + ex.getMessage());
             ex.printStackTrace();
         } catch (ScaledDownPicture.NotAnImage ex) {
-            Log.e(PhotoView.class.getName(), "This shouldn't happen: " + ex.getMessage());
+            Log.e(PhotoViewFragment.class.getName(), "This shouldn't happen: " + ex.getMessage());
         }
 
         activity.findViewById(R.id.wCurrentImage).setVisibility(View.VISIBLE);
         callbacks.pictureRendered();
 
-        Log.i(PhotoView.class.getName(), "Loaded " + pic.getPicture().getFileName());
+        Log.i(PhotoViewFragment.class.getName(), "Loaded " + pic.getPicture().getFileName());
         precacheNextPicture(preCacheCount);
     }
 

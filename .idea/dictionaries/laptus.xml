@@ -2,6 +2,9 @@
   <dictionary name="laptus">
     <words>
       <w>argv</w>
+      <w>deparcelled</w>
+      <w>deparcelling</w>
+      <w>dest</w>
       <w>fname</w>
       <w>fnames</w>
       <w>goto</w>
@@ -9,6 +12,7 @@
       <w>mogrify</w>
       <w>precache</w>
       <w>precached</w>
+      <w>precaching</w>
       <w>resizer</w>
       <w>trippingsdcardphotomanager</w>
     </words>

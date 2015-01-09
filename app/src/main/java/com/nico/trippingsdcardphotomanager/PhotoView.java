@@ -166,10 +166,8 @@ public class PhotoView extends FragmentActivity implements
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.i(PhotoView.class.getName(), "Starting activity to apply pending changes.");
-                                // TODO rename class (and strings), pass album instead of paths (!)
-                                Intent intent = new Intent(self, PicDeleterActivity.class);
-                                intent.putExtra(PicDeleterActivity.ACTIVITY_PARAM_SELECTED_PATH, album.getPath());
-                                intent.putExtra(PicDeleterActivity.ACTIVITY_PARAM_FILE_NAMES_LIST, album.getFileNamesToDelete());
+                                Intent intent = new Intent(self, PendingOpsApplierActivity.class);
+                                intent.putExtra(PendingOpsApplierActivity.ACTIVITY_PARAM_ALBUM, album);
                                 startActivity(intent);
                             }
                         })

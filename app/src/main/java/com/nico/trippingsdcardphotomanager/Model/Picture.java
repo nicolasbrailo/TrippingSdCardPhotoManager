@@ -1,11 +1,13 @@
 package com.nico.trippingsdcardphotomanager.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.LruCache;
 import android.view.WindowManager;
 
 import java.io.File;
 
-public class Picture {
+public class Picture implements Parcelable {
     private final LruCache<String, ScaledDownPicture> pictureCache;
     private final String path;
     private final String fname;
@@ -35,6 +37,10 @@ public class Picture {
     }
 
     public boolean needsResizing() { return (pictureCache.get(fname) == null); }
+
+    protected void setDeletionFlag(boolean deletionFlag) { this.markedForDeletion = deletionFlag; }
+
+    protected void setCompressionLevel(int compressionLevel) { this.compressionLevel = compressionLevel; }
 
     public ScaledDownPicture getDisplayImage() {
         ScaledDownPicture pic = pictureCache.get(fname);
@@ -85,5 +91,25 @@ public class Picture {
         if (isMarkedForDeletion()) return true;
         if (isMarkedForCompression()) return true;
         return false;
+    }
+
+
+    // This object can be serialized and sent to other activities, but never deparcelled.
+    // It can be deparcelled to a NonDisplayablePicture instead.
+    // If it's ever necessary to render a NonDisplayablePicture, the lru cache would have
+    // to be refactored out of this class or injected in a setter method
+    public static final Parcelable.Creator<Picture> CREATOR = null;
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(path);
+        dest.writeString(fname);
+        dest.writeInt(markedForDeletion? 1 : 0);
+        dest.writeInt(compressionLevel);
     }
 }

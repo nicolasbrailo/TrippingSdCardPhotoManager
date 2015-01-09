@@ -23,7 +23,7 @@
             android:label="@string/title_activity_photo_view" >
         </activity>
         <activity
-            android:name=".PicDeleterActivity"
+            android:name=".PendingOpsApplierActivity"
             android:label="@string/title_activity_pic_deleter"
             android:parentActivityName=".PhotoView" >
             <meta-data

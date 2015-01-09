@@ -3,44 +3,54 @@ package com.nico.trippingsdcardphotomanager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.nico.trippingsdcardphotomanager.Model.Album;
+import com.nico.trippingsdcardphotomanager.Model.Picture;
 import com.nico.trippingsdcardphotomanager.Services.PictureRemover;
 
 
-public class PicDeleterActivity extends Activity implements PictureRemover.Callback {
-    public static final String ACTIVITY_PARAM_SELECTED_PATH = "com.nico.trippingsdcardphotomanager.ALBUM_PATH";
-    public static final String ACTIVITY_PARAM_FILE_NAMES_LIST = "com.nico.trippingsdcardphotomanager.FILE_NAMES_LIST";
+public class PendingOpsApplierActivity extends Activity implements PictureRemover.Callback {
+    public static final String ACTIVITY_PARAM_ALBUM = "com.nico.trippingsdcardphotomanager.ALBUM";
 
-    private PictureRemover rm;
-    private String path;
+    // private PictureRemover rm;
+    private Album album;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pic_deleter);
 
-        String path = getIntent().getStringExtra(ACTIVITY_PARAM_SELECTED_PATH);
-        String[] toDelete = getIntent().getStringArrayExtra(ACTIVITY_PARAM_FILE_NAMES_LIST);
+        album = getIntent().getParcelableExtra(ACTIVITY_PARAM_ALBUM);
+
+        Log.i("*****************", album.getPath());
+        for (Picture pic : album) {
+            Log.i("*****************", pic.getFileName());
+            Log.i("*****************\t", (pic.isMarkedForDeletion()? "Delete" : "No delete"));
+            Log.i("*****************\t", (pic.isMarkedForCompression()? "Compress " + pic.getCompressionLevel() : "No Compress"));
+        }
 
         TextView tw = (TextView) findViewById(R.id.wDeletionActivityTitle);
-        tw.setText(String.format(getResources().getString(R.string.label_deleting_selected_files), path));
+        tw.setText(String.format(getResources().getString(R.string.label_deleting_selected_files), album.getPath()));
 
-        this.path = path;
-        rm = new PictureRemover(this, path, toDelete);
-        rm.execute();
+        // rm = new PictureRemover(this, path, toDelete);
+        // rm.execute();
     }
 
     public void onCancelRequested(View view) {
-        rm.cancel(true);
+        // rm.cancel(true);
         markOperationCompleted(R.string.label_deleting_selected_files_cancelled);
     }
 
     public void onDeleterActivityClose(View view) {
+        // Don't try to send back a parcelled version of the album, because:
+        // 1. The pictures in this album are now non-parcelable
+        // 2. It'd be a mess of synchronization, and I don't want to deal with it
         Intent intent = new Intent(this, PhotoView.class);
-        intent.putExtra(PhotoView.ACTIVITY_PARAM_SELECTED_PATH, path);
+        intent.putExtra(PhotoView.ACTIVITY_PARAM_SELECTED_PATH, album.getPath());
         startActivity(intent);
     }
 
@@ -56,7 +66,7 @@ public class PicDeleterActivity extends Activity implements PictureRemover.Callb
 
     private void markOperationCompleted(int statusStringResourceId) {
         TextView tw = (TextView) findViewById(R.id.wDeletionActivityTitle);
-        tw.setText(String.format(getResources().getString(statusStringResourceId), path));
+        tw.setText(String.format(getResources().getString(statusStringResourceId), album.getPath()));
 
         findViewById(R.id.wGoBackToAlbum).setVisibility(View.VISIBLE);
         findViewById(R.id.wStopRemovalOperation).setVisibility(View.GONE);

@@ -1,12 +1,15 @@
 package com.nico.trippingsdcardphotomanager.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.LruCache;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class Album {
+public class Album implements Parcelable, Iterable<Picture> {
     private final double CACHE_USAGE_MULTIPLIER = 0.4;
 
     private LruCache<String,ScaledDownPicture> pictureCache;
@@ -76,7 +79,7 @@ public class Album {
 
     public void jumpTo(int num) {
         int d = num - currentPosition;
-        currentPosition = advance(num);
+        currentPosition = advance(d);
     }
 
     public Picture getPictureAtRelativePosition(int i) { return pics.get(advance(i)); }
@@ -103,4 +106,37 @@ public class Album {
         if (newPos< 0) newPos = pics.size() - 1;
         return newPos;
     }
+
+    @Override
+    public Iterator<Picture> iterator() {
+        return pics.iterator();
+    }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(path);
+        dest.writeTypedList(pics);
+    }
+
+    public Album(Parcel in) {
+        path = in.readString();
+        pics = new ArrayList<>();
+        in.readTypedList(pics, NonDisplayablePicture.CREATOR);
+    }
+
+    public static final Parcelable.Creator<Album> CREATOR = new Parcelable.Creator<Album>() {
+        public Album createFromParcel(Parcel in) {
+            return new Album(in);
+        }
+
+        public Album[] newArray(int size) {
+            return new Album[size];
+        }
+    };
 }
