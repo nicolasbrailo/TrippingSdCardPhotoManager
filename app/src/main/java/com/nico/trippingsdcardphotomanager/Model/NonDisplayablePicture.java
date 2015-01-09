@@ -11,7 +11,7 @@ import android.view.WindowManager;
 public class NonDisplayablePicture extends Picture implements Parcelable {
 
     public NonDisplayablePicture(Parcel in) {
-        super(null, in.readString(), in.readString());
+        super(in.readString(), in.readString());
         setDeletionFlag(in.readInt() != 0);
         setCompressionLevel(in.readInt());
     }

@@ -20,7 +20,13 @@ public class Picture implements Parcelable {
         this.fname = fname;
     }
 
-    public String getFullPath() {
+    protected Picture(final String path, final String fname) {
+        this.path = path;
+        this.fname = fname;
+        this.pictureCache = null;
+    }
+
+        public String getFullPath() {
         return path;
     }
 
@@ -109,7 +115,7 @@ public class Picture implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(path);
         dest.writeString(fname);
-        dest.writeInt(markedForDeletion? 1 : 0);
+        dest.writeInt(markedForDeletion ? 1 : 0);
         dest.writeInt(compressionLevel);
     }
 }
