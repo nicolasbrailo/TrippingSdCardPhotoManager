@@ -4,7 +4,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := trippingImageMogrifier
 LOCAL_LDLIBS += -lm -lz -llog
 LOCAL_C_INCLUDES += -I ./ImageMagick -I ./jpeg-6b
-LOCAL_CFLAGS += -g -ggdb -O0
+#LOCAL_CFLAGS += -g -ggdb -O0
 
 # Pick one: jmemnobs seems to be more portable, jmemansi seems to support
 # easier processing of bigger images, jmemname I have no clue

@@ -9,15 +9,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
-import com.nico.trippingsdcardphotomanager.Model.Picture;
-import com.nico.trippingsdcardphotomanager.PictureMogrifier.PictureMogrifier;
-import com.nico.trippingsdcardphotomanager.Services.PictureRemover;
+import com.nico.trippingsdcardphotomanager.Services.PendingOpsApplier;
 
 
-public class PendingOpsApplierActivity extends Activity implements PictureRemover.Callback {
+public class PendingOpsApplierActivity extends Activity implements PendingOpsApplier.Callback {
     public static final String ACTIVITY_PARAM_ALBUM = "com.nico.trippingsdcardphotomanager.ALBUM";
 
-    // private PictureRemover rm;
+    private PendingOpsApplier opApplier;
     private Album album;
 
     @Override
@@ -25,24 +23,18 @@ public class PendingOpsApplierActivity extends Activity implements PictureRemove
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pic_deleter);
 
+        Log.i(PendingOpsApplierActivity.class.getName(), "Starting activity");
         album = getIntent().getParcelableExtra(ACTIVITY_PARAM_ALBUM);
-
-        Log.i("*****************", album.getPath());
-        for (Picture pic : album) {
-            Log.i("*****************", pic.getFileName());
-            Log.i("*****************\t", (pic.isMarkedForDeletion()? "Delete" : "No delete"));
-            Log.i("*****************\t", (pic.isMarkedForCompression()? "Compress " + pic.getCompressionLevel() : "No Compress"));
-        }
 
         TextView tw = (TextView) findViewById(R.id.wDeletionActivityTitle);
         tw.setText(String.format(getResources().getString(R.string.label_deleting_selected_files), album.getPath()));
 
-        // rm = new PictureRemover(this, path, toDelete);
-        // rm.execute();
+        opApplier = new PendingOpsApplier(this, album);
+        opApplier.execute();
     }
 
     public void onCancelRequested(View view) {
-        // rm.cancel(true);
+        opApplier.cancel(true);
         markOperationCompleted(R.string.label_deleting_selected_files_cancelled);
     }
 
@@ -56,19 +48,13 @@ public class PendingOpsApplierActivity extends Activity implements PictureRemove
     }
 
     @Override
-    public void onPictureRemoverComplete() {
+    public void onComplete() {
         markOperationCompleted(R.string.label_deleting_selected_files_done);
     }
 
     @Override
-    public void onPictureRemoverProgressReport(int pct) {
+    public void onProgressReport(int pct) {
         ((ProgressBar) findViewById(R.id.wDeletionProgressBar)).setProgress(pct);
-    }
-
-    public void mogrifyImg(View view) {
-        String argv[] = {"-quality", "8", album.getCurrentPicture().getFullPath()};
-        int meaning = PictureMogrifier.mogrify(argv);
-        Log.i(PhotoView.class.getName(), "Meaning of life = " + meaning);
     }
 
     private void markOperationCompleted(int statusStringResourceId) {

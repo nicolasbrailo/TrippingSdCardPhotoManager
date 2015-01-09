@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.AlbumContainer;
 import com.nico.trippingsdcardphotomanager.Model.PhotoViewerFilter;
-import com.nico.trippingsdcardphotomanager.PictureMogrifier.PictureMogrifier;
 
 
 public class PhotoView extends FragmentActivity implements
