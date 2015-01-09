@@ -87,19 +87,6 @@ public class Album implements Parcelable, Iterable<Picture> {
         return pics.get(currentPosition);
     }
 
-    public String[] getFileNamesToDelete() {
-        List<String> fnames = new ArrayList<>();
-        for (Picture pic : pics) {
-            if (pic.isMarkedForDeletion()) {
-                fnames.add(pic.getFileName());
-            }
-        }
-
-        String[] strFnames = new String[fnames.size()];
-        strFnames = fnames.toArray(strFnames);
-        return strFnames;
-    }
-
     private int advance(int i) {
         int newPos = currentPosition + i;
         if (newPos >= pics.size()) newPos = 0;

@@ -124,12 +124,6 @@ public class PhotoView extends FragmentActivity implements
         toast.show();
     }
 
-    public void mogrifyImg(View view) {
-        String argv[] = {"-quality", "8", album.getCurrentPicture().getFullPath()};
-        int meaning = PictureMogrifier.mogrify(argv);
-        Log.i(PhotoView.class.getName(), "Meaning of life = " + meaning);
-    }
-
     /**********************************************************************************************/
     /* Menu handling */
     /**********************************************************************************************/

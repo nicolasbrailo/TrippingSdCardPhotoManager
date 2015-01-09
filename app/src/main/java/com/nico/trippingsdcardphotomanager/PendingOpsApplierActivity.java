@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.Picture;
+import com.nico.trippingsdcardphotomanager.PictureMogrifier.PictureMogrifier;
 import com.nico.trippingsdcardphotomanager.Services.PictureRemover;
 
 
@@ -62,6 +63,12 @@ public class PendingOpsApplierActivity extends Activity implements PictureRemove
     @Override
     public void onPictureRemoverProgressReport(int pct) {
         ((ProgressBar) findViewById(R.id.wDeletionProgressBar)).setProgress(pct);
+    }
+
+    public void mogrifyImg(View view) {
+        String argv[] = {"-quality", "8", album.getCurrentPicture().getFullPath()};
+        int meaning = PictureMogrifier.mogrify(argv);
+        Log.i(PhotoView.class.getName(), "Meaning of life = " + meaning);
     }
 
     private void markOperationCompleted(int statusStringResourceId) {
