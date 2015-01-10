@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/menu_review_pics_and_apply_changes"
+        android:title="@string/menu_review_pics_and_apply_changes"
+        android:visible="true" />
+
+    <item android:id="@+id/menu_goto_picture"
+        android:title="@string/menu_goto_picture" />
+
+    <item android:id="@+id/menu_choose_another_album"
+        android:title="@string/menu_choose_different_path" />
+
+    <item android:id="@+id/menu_help"
+        android:title="@string/menu_help" />
+
+</menu>

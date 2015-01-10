@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/menu_apply_pending_changes"
+        android:title="@string/menu_apply_pending_changes"  />
+
+    <item android:id="@+id/menu_stop_reviewing_changes_and_view_full_album"
+        android:title="@string/menu_stop_reviewing_changes_and_view_full_album" />
+
+    <item android:id="@+id/menu_goto_picture"
+        android:title="@string/menu_goto_picture" />
+
+    <item android:id="@+id/menu_choose_another_album"
+        android:title="@string/menu_choose_different_path" />
+
+    <item android:id="@+id/menu_review_mode_help"
+        android:title="@string/menu_review_mode_help" />
+</menu>

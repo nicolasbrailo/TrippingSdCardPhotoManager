@@ -24,10 +24,10 @@ import com.nico.trippingsdcardphotomanager.Model.PhotoViewerFilter;
 
 public class PhotoView extends FragmentActivity implements
                         GestureDetector.OnGestureListener,
-                        PopupMenu.OnMenuItemClickListener,
                         PhotoViewFragment.PhotoShownCallbacks,
                         AlbumContainer,
                         PhotoViewerFilter.FilterCallback,
+                        PhotoActionsFragment.Callback,
                         View.OnClickListener {
 
     public static final String ACTIVITY_PARAM_SELECTED_PATH = "com.nico.trippingsdcardphotomanager.ALBUM_PATH";
@@ -75,8 +75,8 @@ public class PhotoView extends FragmentActivity implements
 
     @Override
     public void pictureRendered() {
-        findViewById(R.id.wPhotoActionsFragment).setVisibility(View.VISIBLE);
         findViewById(R.id.wPhotoViewerFragment).setVisibility(View.VISIBLE);
+        photoActionsBar.enable();
         setStatusMessage_CurrentPic();
         photoActionsBar.updateGUIFor(album.getCurrentPicture());
     }
@@ -84,6 +84,7 @@ public class PhotoView extends FragmentActivity implements
     @Override
     public void invalidPictureReceived() {
         findViewById(R.id.wPhotoViewerFragment).setVisibility(View.INVISIBLE);
+        photoActionsBar.disable();
         final String msg = getResources().getString(R.string.status_invalid_picture);
         setStatusMessage(String.format(msg, album.getCurrentPicture().getFileName()));
     }
@@ -115,86 +116,12 @@ public class PhotoView extends FragmentActivity implements
     @Override
     public void onAllPicsFilteredOut() {
         findViewById(R.id.wPhotoViewerFragment).setVisibility(View.INVISIBLE);
-        findViewById(R.id.wPhotoActionsFragment).setVisibility(View.GONE);
+        photoActionsBar.disable();
         setStatusMessage(getResources().getString(R.string.status_album_has_no_pictures_to_show));
 
         CharSequence msg = getResources().getString(R.string.status_no_pictures_with_pending_ops);
         Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
         toast.show();
-    }
-
-    /**********************************************************************************************/
-    /* Menu handling */
-    /**********************************************************************************************/
-    private boolean applyFilter(PhotoViewerFilter filter, int stringId) {
-        this.photoFilter = filter;
-        photoFilter.resetPosition(album);
-        showCurrentPicture();
-
-        CharSequence msg = getResources().getString(stringId);
-        Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
-        toast.show();
-        return true;
-    }
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        // TODO: Remove menu when no pics in the album
-        switch (item.getItemId()) {
-            case R.id.menu_review_pics_and_apply_changes:
-                return applyFilter(new PhotoViewerFilter.OnlyWithPendingOps(this),
-                        R.string.status_reviewing_pending_ops);
-
-            case R.id.menu_stop_reviewing_changes_and_view_full_album:
-                return applyFilter(new PhotoViewerFilter.NoFiltering(),
-                        R.string.status_viewing_full_album);
-
-            case R.id.menu_apply_pending_changes:
-                final PhotoView self = this;
-                new AlertDialog.Builder(this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle(R.string.alert_confirm_pending_ops_title)
-                        .setMessage(R.string.alert_confirm_pending_ops_msg)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Log.i(PhotoView.class.getName(), "Starting activity to apply pending changes.");
-                                Intent intent = new Intent(self, PendingOpsApplierActivity.class);
-                                intent.putExtra(PendingOpsApplierActivity.ACTIVITY_PARAM_ALBUM, album);
-                                startActivity(intent);
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
-                return true;
-
-            case R.id.menu_goto_picture:
-                popupGotoPicture();
-                return true;
-
-            case R.id.menu_choose_another_album:
-                startActivity(new Intent(this, DirSelect.class));
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    public void onOpenMenuClicked(View view) {
-        PopupMenu menu = new PopupMenu(this, view);
-        menu.getMenuInflater().inflate(R.menu.menu_photo_view, menu.getMenu());
-        menu.setOnMenuItemClickListener(this);
-
-        if (photoFilter instanceof PhotoViewerFilter.OnlyWithPendingOps) {
-            menu.getMenu().findItem(R.id.menu_review_pics_and_apply_changes).setVisible(false);
-            menu.getMenu().findItem(R.id.menu_stop_reviewing_changes_and_view_full_album).setVisible(true);
-            menu.getMenu().findItem(R.id.menu_apply_pending_changes).setVisible(true);
-        } else {
-            // Use default view options
-        }
-
-        menu.show();
     }
 
     /**********************************************************************************************/
@@ -235,45 +162,53 @@ public class PhotoView extends FragmentActivity implements
             case R.id.wPictureStats:
                 // TODO: minimize stats
                 break;
-            case R.id.wCurrentImage:    // TODO: Can I attach this even to any ctrl?
-                popupGotoPicture();
             default:
                 throw new AssertionError(PhotoView.class.getName() +
                         " shouldn't be used as a listener for this event!");
         }
     }
 
-    public void popupGotoPicture() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.title_jump_to_pic));
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        builder.setView(input);
+    @Override
+    public boolean isReviewModeEnabled() {
+        return (photoFilter instanceof PhotoViewerFilter.OnlyWithPendingOps);
+    }
 
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    int num = Integer.parseInt(input.getText().toString());
-                    album.jumpTo(num - 1);
-                    showCurrentPicture();
+    @Override
+    public void switchToAlbumMode() {
+        applyFilter(new PhotoViewerFilter.NoFiltering(),
+                R.string.status_viewing_full_album);
+    }
 
-                    // Trigger a new cache warm-up at the new position
-                    photoViewer.warmUpCache();
+    @Override
+    public void switchToReviewMode() {
+        applyFilter(new PhotoViewerFilter.OnlyWithPendingOps(this),
+                R.string.status_reviewing_pending_ops);
+    }
 
-                } catch (NumberFormatException ex) {
-                    Log.e(PhotoViewFragment.class.getName(), "GOTO Pic: number format is wrong.");
-                }
-            }
-        });
+    private void applyFilter(PhotoViewerFilter filter, int stringId) {
+        this.photoFilter = filter;
+        photoFilter.resetPosition(album);
+        showCurrentPicture();
 
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        CharSequence msg = getResources().getString(stringId);
+        Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
+        toast.show();
+    }
 
-        builder.show();
+    @Override
+    public void confirmAllPendingChanges() {
+        Log.i(PhotoView.class.getName(), "Starting activity to apply pending changes.");
+        Intent intent = new Intent(this, PendingOpsApplierActivity.class);
+        intent.putExtra(PendingOpsApplierActivity.ACTIVITY_PARAM_ALBUM, album);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onGotoPicRequested(int jumpTo) {
+        album.jumpTo(jumpTo);
+        showCurrentPicture();
+
+        // Trigger a new cache warm-up at the new position
+        photoViewer.warmUpCache();
     }
 }
