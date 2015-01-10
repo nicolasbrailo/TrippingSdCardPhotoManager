@@ -8,6 +8,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -17,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import com.nico.trippingsdcardphotomanager.Model.AlbumContainer;
 import com.nico.trippingsdcardphotomanager.Model.Picture;
@@ -153,7 +157,7 @@ public class PhotoActionsFragment extends Fragment
                 return true;
 
             case R.id.menu_help:
-                Log.e(PhotoActionsFragment.class.getName(), "Halp");
+                showHelpDialog(R.string.album_mode_help_msg);
                 return true;
 
             /* Review mode menu */
@@ -166,7 +170,7 @@ public class PhotoActionsFragment extends Fragment
                 return true;
 
             case R.id.menu_review_mode_help:
-                Log.e(PhotoActionsFragment.class.getName(), "Halp");
+                showHelpDialog(R.string.review_mode_help_msg);
                 return true;
 
             default:
@@ -208,13 +212,28 @@ public class PhotoActionsFragment extends Fragment
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(R.string.alert_confirm_pending_ops_title)
                 .setMessage(R.string.alert_confirm_pending_ops_msg)
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         cb.confirmAllPendingChanges();
                     }
                 })
-                .setNegativeButton(R.string.cancel, null)
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void showHelpDialog(int resId) {
+        final TextView message = new TextView(activity);
+        final SpannableString s = new SpannableString(activity.getText(resId));
+        Linkify.addLinks(s, Linkify.WEB_URLS);
+        message.setText(s);
+        message.setMovementMethod(LinkMovementMethod.getInstance());
+
+        new AlertDialog.Builder(activity)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setTitle(R.string.help_dialog_title)
+                .setView(message)
+                .setPositiveButton(android.R.string.ok, null)
                 .show();
     }
 

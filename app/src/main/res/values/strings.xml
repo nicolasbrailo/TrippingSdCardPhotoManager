@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">TrippingSdCardPhotoManager</string>
+    <string name="app_name">TrippingPhotoManager</string>
     <string name="loading">Loading…</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_photo_view">PhotoView</string>
@@ -22,8 +22,6 @@
     <string name="menu_apply_pending_changes">Apply all pending changes</string>
     <string name="alert_confirm_pending_ops_title">Are you sure?</string>
     <string name="alert_confirm_pending_ops_msg">You are about to apply ALL pending changes. The images marked for deletion will be gone. Forever. There is no going back. Are you really sure?</string>
-    <string name="yes">Yes</string>
-    <string name="cancel">Not yet</string>
     <string name="title_activity_pic_deleter">PicDeleterActivity</string>
     <string name="btn_stop_applying_pending_ops">Stop pending operations…</string>
     <string name="btn_back_to_album">Go back to album</string>
@@ -44,5 +42,35 @@
     <string name="ops_applier_error_compressing_file">"Error compressing %1$s (ret=%1$d)"</string>
     <string name="menu_help">Help</string>
     <string name="menu_review_mode_help">Help</string>
+    <string name="help_dialog_title">Help</string>
+    <string name="album_mode_help_msg">
+        Welcome to Tripping Photo Manager - https://github.com/nicolasbrailo/TrippingSdCardPhotoManager\n\n
+
+        Review your pictures by swiping. If there is a picture you don\'t like mark it for deletion
+        using the action bar above. It won\'t be deleted until you confirm.\n\n
+
+        When you are done, delete all the unwanted pictures at once: select the option
+        \"Review and apply changes…\" from the action bar. Once in review mode, you can review the
+        pending operations. When ready, go once more to the menu and select the option
+        \"Apply all pending changes\".\n\n
+
+        Tripping Photo Manager can also compress photos. Using a 90% compression usually results
+        in no visible quality difference, even at 100% zoom. Mark the pictures you want to compress
+        with the button in the action bar.\n\n
+
+        Tripping Photo Manager bundles ImageMagick: any action that you can do with \"mogrify\" can also
+        be done with Tripping Photo Manager.\n\n
+
+        This is an open source project. Go to https://github.com/nicolasbrailo/TrippingSdCardPhotoManager
+        to request features or just to check out the source code.
+    </string>
+    <string name="review_mode_help_msg">
+        You are in review mode: review all the changes you have selected, then in the action bar
+        select the \"Apply all pending changes\" option.\n\n
+
+        Remember that deleting pictures can never be undone.\n\n
+
+        More info? Go to https://github.com/nicolasbrailo/TrippingSdCardPhotoManager
+    </string>
 
 </resources>
