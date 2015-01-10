@@ -24,11 +24,10 @@ import com.nico.trippingsdcardphotomanager.Model.PhotoViewerFilter;
 
 public class PhotoView extends FragmentActivity implements
                         GestureDetector.OnGestureListener,
-                        PhotoViewFragment.PhotoShownCallbacks,
                         AlbumContainer,
+                        PhotoViewFragment.PhotoShownCallbacks,
                         PhotoViewerFilter.FilterCallback,
-                        PhotoActionsFragment.Callback,
-                        View.OnClickListener {
+                        PhotoActionsFragment.Callback  {
 
     public static final String ACTIVITY_PARAM_SELECTED_PATH = "com.nico.trippingsdcardphotomanager.ALBUM_PATH";
     private static final float SWIPE_THRESHOLD_VELOCITY = 100;
@@ -125,48 +124,8 @@ public class PhotoView extends FragmentActivity implements
     }
 
     /**********************************************************************************************/
-    /* Stuff for touch gestures detection */
-    /**********************************************************************************************/
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        this.mDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        if((velocityX > 0) && (Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)) {
-            photoFilter.moveBackwards(album);
-        } else if((velocityX < 0) && (Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)) {
-            photoFilter.moveForward(album);
-        }
-
-        showCurrentPicture();
-        return false;
-    }
-
-    // Events we don't care about
-    @Override public boolean onDown(MotionEvent e) { return false; }
-    @Override public void onShowPress(MotionEvent e) {}
-    @Override public boolean onSingleTapUp(MotionEvent e) { return false; }
-    @Override public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) { return false; }
-    @Override public void onLongPress(MotionEvent e) { }
-
-
-    /**********************************************************************************************/
     /* Integration with UI elements */
     /**********************************************************************************************/
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.wPictureStats:
-                // TODO: minimize stats
-                break;
-            default:
-                throw new AssertionError(PhotoView.class.getName() +
-                        " shouldn't be used as a listener for this event!");
-        }
-    }
 
     @Override
     public boolean isReviewModeEnabled() {
@@ -211,4 +170,32 @@ public class PhotoView extends FragmentActivity implements
         // Trigger a new cache warm-up at the new position
         photoViewer.warmUpCache();
     }
+
+    /**********************************************************************************************/
+    /* Stuff for touch gestures detection */
+    /**********************************************************************************************/
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        this.mDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        if((velocityX > 0) && (Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)) {
+            photoFilter.moveBackwards(album);
+        } else if((velocityX < 0) && (Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)) {
+            photoFilter.moveForward(album);
+        }
+
+        showCurrentPicture();
+        return false;
+    }
+
+    // Events we don't care about
+    @Override public boolean onDown(MotionEvent e) { return false; }
+    @Override public void onShowPress(MotionEvent e) {}
+    @Override public boolean onSingleTapUp(MotionEvent e) { return false; }
+    @Override public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) { return false; }
+    @Override public void onLongPress(MotionEvent e) { }
 }
