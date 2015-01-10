@@ -1,15 +1,12 @@
 package com.nico.trippingsdcardphotomanager.Services;
 
 import android.os.AsyncTask;
-import android.os.SystemClock;
 import android.util.Log;
-import android.view.View;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.Picture;
-import com.nico.trippingsdcardphotomanager.PendingOpsApplierActivity;
-import com.nico.trippingsdcardphotomanager.PhotoView;
 import com.nico.trippingsdcardphotomanager.PictureMogrifier.PictureMogrifier;
+import com.nico.trippingsdcardphotomanager.R;
 
 import java.io.File;
 
@@ -18,6 +15,8 @@ public class PendingOpsApplier extends AsyncTask<Void, Integer, Void> {
     public interface Callback {
         public void onComplete();
         public void onProgressReport(int pct);
+        public void addToLog(String msg);
+        public String getString(int resource);
     }
 
     private final Callback cb;
@@ -60,22 +59,43 @@ public class PendingOpsApplier extends AsyncTask<Void, Integer, Void> {
     }
 
     private void doDelete(Picture pic) {
-        Log.i(PendingOpsApplier.class.getName(), "Removing " + pic.getFullPath());
-        // TODO: Add a log to the screen with this op
+        Log.i(PendingOpsApplier.class.getName(), "Removing " + pic.getFileName());
 
         File fp = new File(pic.getFullPath());
-        fp.delete();
+        if (fp.delete()) {
+            String msg = String.format(cb.getString(R.string.ops_applier_removed_file),
+                    pic.getFileName());
+            cb.addToLog(msg);
+        } else {
+            String msg = String.format(cb.getString(R.string.ops_applier_error_removing_file),
+                    pic.getFileName());
+            cb.addToLog(msg);
+        }
     }
 
     private void doCompress(Picture pic) {
-        Log.i(PendingOpsApplier.class.getName(), "Compressing " + pic.getFullPath() +
-                " to " + pic.getCompressionLevel());
-        // TODO: Add a log to the screen with this op
+        String msg = String.format(cb.getString(R.string.ops_applier_start_file_compress),
+                pic.getFileName(),
+                pic.getFileSizeInMb());
+        Log.i(PendingOpsApplier.class.getName(), msg);
+        cb.addToLog(msg);
 
         String argv[] = {"-quality", String.valueOf(pic.getCompressionLevel()),
                          pic.getFullPath()};
         int ret = PictureMogrifier.mogrify(argv);
         Log.i(PendingOpsApplier.class.getName(), "\tCompressed " + pic.getFullPath() + " = " + ret);
+
+        String msg2;
+        if (ret == 0) {
+            msg2 = String.format(cb.getString(R.string.ops_applier_done_file_compress),
+                    pic.getFileName(),
+                    pic.getFileSizeInMb());
+        } else {
+            msg2 = String.format(cb.getString(R.string.ops_applier_error_compressing_file),
+                    pic.getFileName());
+        }
+        Log.i(PendingOpsApplier.class.getName(), msg2);
+        cb.addToLog(msg2);
     }
 
 }

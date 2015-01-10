@@ -1,0 +1,44 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/wOpsApplier_ProgressBar"  />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="10dp"
+        android:inputType="textMultiLine"
+        android:clickable="false"
+        android:cursorVisible="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:ems="10"
+        android:gravity="top"
+        android:layout_weight="1"
+        android:background="@drawable/picture_stats_bg"
+        android:id="@+id/wOpsApplier_Log" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_stop_applying_pending_ops"
+        android:id="@+id/wOpsApplier_Cancel"
+        android:onClick="onCancelRequested"
+        android:layout_marginBottom="52dp" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_back_to_album"
+        android:id="@+id/wOpsApplier_BackToAlbum"
+        android:onClick="onDeleterActivityClose"
+        android:visibility="gone"/>
+
+</LinearLayout>

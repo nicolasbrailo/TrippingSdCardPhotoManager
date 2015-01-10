@@ -21,13 +21,12 @@ public class PendingOpsApplierActivity extends Activity implements PendingOpsApp
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pic_deleter);
+        setContentView(R.layout.activity_pending_ops_applier);
 
         Log.i(PendingOpsApplierActivity.class.getName(), "Starting activity");
         album = getIntent().getParcelableExtra(ACTIVITY_PARAM_ALBUM);
-
-        TextView tw = (TextView) findViewById(R.id.wDeletionActivityTitle);
-        tw.setText(String.format(getResources().getString(R.string.label_deleting_selected_files), album.getPath()));
+        TextView x = (TextView) findViewById(R.id.wOpsApplier_Log);
+        x.append(getString(R.string.ops_applier_about_to_start) + album.getPath() + "\n\n");
 
         opApplier = new PendingOpsApplier(this, album);
         opApplier.execute();
@@ -35,7 +34,38 @@ public class PendingOpsApplierActivity extends Activity implements PendingOpsApp
 
     public void onCancelRequested(View view) {
         opApplier.cancel(true);
-        markOperationCompleted(R.string.label_deleting_selected_files_cancelled);
+        markOperationCompleted(R.string.label_pending_ops_cancelled);
+    }
+
+    @Override
+    public void onComplete() {
+        markOperationCompleted(R.string.label_pending_ops_done);
+    }
+
+    @Override
+    public void onProgressReport(int pct) {
+        ((ProgressBar) findViewById(R.id.wOpsApplier_ProgressBar)).setProgress(pct);
+    }
+
+    @Override
+    public void addToLog(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TextView log = (TextView) findViewById(R.id.wOpsApplier_Log);
+                log.append(msg);
+                log.append("\n");
+            }
+        });
+    }
+
+    private void markOperationCompleted(int statusStringResourceId) {
+        TextView log = (TextView) findViewById(R.id.wOpsApplier_Log);
+        log.append(getResources().getString(statusStringResourceId));
+
+        findViewById(R.id.wOpsApplier_BackToAlbum).setVisibility(View.VISIBLE);
+        findViewById(R.id.wOpsApplier_Cancel).setVisibility(View.GONE);
+        ((ProgressBar) findViewById(R.id.wOpsApplier_ProgressBar)).setProgress(100);
     }
 
     public void onDeleterActivityClose(View view) {
@@ -45,26 +75,5 @@ public class PendingOpsApplierActivity extends Activity implements PendingOpsApp
         Intent intent = new Intent(this, PhotoView.class);
         intent.putExtra(PhotoView.ACTIVITY_PARAM_SELECTED_PATH, album.getPath());
         startActivity(intent);
-    }
-
-    @Override
-    public void onComplete() {
-        markOperationCompleted(R.string.label_deleting_selected_files_done);
-    }
-
-    @Override
-    public void onProgressReport(int pct) {
-        ((ProgressBar) findViewById(R.id.wDeletionProgressBar)).setProgress(pct);
-    }
-
-    private void markOperationCompleted(int statusStringResourceId) {
-        TextView tw = (TextView) findViewById(R.id.wDeletionActivityTitle);
-        tw.setText(String.format(getResources().getString(statusStringResourceId), album.getPath()));
-
-        findViewById(R.id.wGoBackToAlbum).setVisibility(View.VISIBLE);
-        findViewById(R.id.wStopRemovalOperation).setVisibility(View.GONE);
-
-        ((ProgressBar) findViewById(R.id.wDeletionProgressBar)).setProgress(100);
-
     }
 }

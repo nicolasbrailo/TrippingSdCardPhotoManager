@@ -12,6 +12,7 @@
         android:contentDescription="@string/description_mark_for_deletion"
         android:src="@android:drawable/ic_delete"
         android:background="@null"
+        android:tint="#CCC"
         android:clickable="true" />
 
     <Button
@@ -23,7 +24,7 @@
         android:contentDescription="@string/description_mark_for_compression"
         android:background="@drawable/ic_compress"
         android:clickable="true"
-        android:gravity="bottom|right"
+        android:gravity="bottom|end"
         android:textColor="#ffff0e00" />
 
     <ImageButton

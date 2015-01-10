@@ -22,7 +22,9 @@
         android:onClick="onDirSelected"
         android:id="@+id/wSelectDir" />
 
-        <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
+        <TextView
+            android:text="@string/dialog_current_path_selection"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/wCurrentDir" />
 
