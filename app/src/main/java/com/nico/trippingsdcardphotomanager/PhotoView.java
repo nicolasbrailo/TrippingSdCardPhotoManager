@@ -1,26 +1,19 @@
 package com.nico.trippingsdcardphotomanager;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GestureDetectorCompat;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.AlbumContainer;
 import com.nico.trippingsdcardphotomanager.Model.PhotoViewerFilter;
-
 
 public class PhotoView extends FragmentActivity implements
                         GestureDetector.OnGestureListener,

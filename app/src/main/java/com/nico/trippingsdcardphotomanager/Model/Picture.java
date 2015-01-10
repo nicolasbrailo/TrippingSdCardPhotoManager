@@ -94,9 +94,7 @@ public class Picture implements Parcelable {
     }
 
     boolean hasPendingOperation() {
-        if (isMarkedForDeletion()) return true;
-        if (isMarkedForCompression()) return true;
-        return false;
+        return (isMarkedForCompression() || isMarkedForDeletion());
     }
 
 
