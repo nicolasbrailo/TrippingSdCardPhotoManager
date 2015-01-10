@@ -9,18 +9,16 @@
     <fragment
         android:name="com.nico.trippingsdcardphotomanager.PhotoViewFragment"
         android:id="@+id/wPhotoViewerFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         tools:layout="@layout/fragment_photo_view" />
 
     <fragment
         android:name="com.nico.trippingsdcardphotomanager.PhotoActionsFragment"
         android:id="@+id/wPhotoActionsFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:layout="@layout/fragment_photo_view"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        tools:layout="@layout/fragment_photo_view" />
 
     <TextView
         android:layout_width="wrap_content"
