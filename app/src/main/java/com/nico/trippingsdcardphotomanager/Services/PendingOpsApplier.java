@@ -32,6 +32,7 @@ public class PendingOpsApplier extends AsyncTask<Void, Integer, Void> {
     private final Callback cb;
     private final Album album;
     private final OpsFilter filter;
+    private boolean backupDirCreated = false;
 
     public PendingOpsApplier(final Callback cb, final Album album, final OpsFilter filter) {
         this.cb = cb;
@@ -87,14 +88,24 @@ public class PendingOpsApplier extends AsyncTask<Void, Integer, Void> {
 
     private void doBackup(Picture pic) {
         String msg = String.format(cb.getString(R.string.ops_applier_backing_up),
-                pic.getFileName(), "/dev/null");
+                pic.getFileName(), pic.getBackupPath());
         Log.i(PendingOpsApplier.class.getName(), msg);
         cb.addToLog(msg);
 
-        // TODO
+        // This assumes all the pics will be backed up to the same place
+        if (!backupDirCreated) {
+            File fp = new File(pic.getBackupPath());
+            if (!fp.exists()) fp.mkdir();
+            backupDirCreated = true;
+        }
 
-        Log.i(PendingOpsApplier.class.getName(), cb.getString(R.string.ops_applier_back_up_done));
-        cb.addToLog(cb.getString(R.string.ops_applier_back_up_done));
+        if (pic.backupToDevice()) {
+            Log.i(PendingOpsApplier.class.getName(), cb.getString(R.string.ops_applier_back_up_done));
+            cb.addToLog(cb.getString(R.string.ops_applier_back_up_done));
+        } else {
+            Log.i(PendingOpsApplier.class.getName(), cb.getString(R.string.ops_applier_back_up_failed));
+            cb.addToLog(cb.getString(R.string.ops_applier_back_up_failed));
+        }
     }
 
     private void doDelete(Picture pic) {

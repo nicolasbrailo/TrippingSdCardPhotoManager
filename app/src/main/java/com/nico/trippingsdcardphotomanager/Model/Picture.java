@@ -6,14 +6,20 @@ import android.util.LruCache;
 import android.view.WindowManager;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class Picture implements Parcelable {
     private final LruCache<String, ScaledDownPicture> pictureCache;
     private final String path;
     private final String fname;
     private boolean markedForDeletion = false;
-    private boolean markedForBackup = false;
     private int compressionLevel = 0;
+    private String backupPath = null;
 
     public Picture(LruCache<String, ScaledDownPicture> pictureCache, final String path, final String fname) {
         this.pictureCache = pictureCache;
@@ -94,26 +100,46 @@ public class Picture implements Parcelable {
         return !noCompress;
     }
 
-    protected void setBackupFlag(boolean flag) {
-        this.markedForBackup = flag;
-    }
-
-    public void unmarkForBackup() {
-        this.markedForBackup = false;
-    }
-
-    public void markForBackup() {
-        this.markedForBackup = true;
+    public void markForBackupTo(final String path) {
+        this.backupPath = path;
     }
 
     public boolean isMarkedForBackup() {
-        return markedForBackup;
+        return (backupPath != null);
     }
 
     boolean hasPendingOperation() {
         return (isMarkedForCompression() || isMarkedForBackup() || isMarkedForDeletion());
     }
 
+    public boolean backupToDevice() {
+        InputStream in = null;
+        OutputStream out = null;
+
+        try {
+            in = new FileInputStream(this.path);
+            out = new FileOutputStream(this.backupPath + this.getFileName());
+
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+
+            return true;
+
+        } catch (FileNotFoundException e) {
+            return false;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public String getBackupPath() {
+        return backupPath;
+    }
 
     // This object can be serialized and sent to other activities, but never deparcelled.
     // It can be deparcelled to a NonDisplayablePicture instead.
@@ -130,8 +156,8 @@ public class Picture implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(path);
         dest.writeString(fname);
+        dest.writeString(backupPath);
         dest.writeInt(markedForDeletion ? 1 : 0);
-        dest.writeInt(markedForBackup ? 1 : 0);
         dest.writeInt(compressionLevel);
     }
 }

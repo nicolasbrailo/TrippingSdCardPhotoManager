@@ -5,11 +5,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.text.SpannableString;
@@ -38,11 +36,9 @@ public class PhotoActionsFragment extends Fragment
         void switchToReviewMode();
         void switchToAlbumMode();
         boolean isReviewModeEnabled();
-        void startBackUp();
         void renameAlbumTo(String s);
+        void startBackUpTo(String s);
     }
-
-    private final String FIRST_TIME_HELP_SHOWN = "firstTimeHelpShown";
 
     private Activity activity;
     private AlbumContainer albumHolder;
@@ -74,6 +70,7 @@ public class PhotoActionsFragment extends Fragment
                     + " must implement PhotoActionsFragment.Callback");
         }
 
+        final String FIRST_TIME_HELP_SHOWN = "firstTimeHelpShown";
         if (activity.getPreferences(0).getString(FIRST_TIME_HELP_SHOWN, "No").equals("No")) {
             showHelpDialog(R.string.album_mode_help_msg);
 
@@ -228,6 +225,34 @@ public class PhotoActionsFragment extends Fragment
     }
 
     private void createBackUp() {
+        final String defaultBackupPath = Environment.getExternalStorageDirectory() + "/" +
+                Environment.DIRECTORY_DCIM + "/" + albumHolder.getAlbum().getAlbumName() + "/";
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(getString(R.string.alert_confirm_backup_title));
+        builder.setMessage(R.string.alert_confirm_backup_msg);
+        final EditText input = new EditText(activity);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setText(defaultBackupPath);
+        builder.setView(input);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                cb.startBackUpTo(input.getText().toString());
+            }
+        });
+
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+
+        /*
         new AlertDialog.Builder(activity)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setTitle(R.string.alert_confirm_backup_title)
@@ -240,6 +265,7 @@ public class PhotoActionsFragment extends Fragment
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+                */
     }
 
     private void popupGotoPicture() {

@@ -169,10 +169,10 @@ public class PhotoView extends FragmentActivity implements
     }
 
     @Override
-    public void startBackUp() {
+    public void startBackUpTo(final String path) {
         Log.i(PhotoView.class.getName(), "Starting activity to back up photos.");
         for (Picture pic : album) {
-            pic.markForBackup();
+            pic.markForBackupTo(path);
         }
 
         // Reuse the pending ops applier for backups

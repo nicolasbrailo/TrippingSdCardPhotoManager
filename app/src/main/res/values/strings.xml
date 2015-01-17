@@ -74,7 +74,7 @@
     </string>
     <string name="menu_create_back_up">Back up album</string>
     <string name="alert_confirm_backup_title">Back up</string>
-    <string name="alert_confirm_backup_msg">Will copy all the pictures to a local storage in your device. This may take a long time.</string>
+    <string name="alert_confirm_backup_msg">Will copy all the pictures to a local storage in your device. This may take a long time. Backup path:</string>
     <string name="menu_rename_album">Rename this album</string>
     <string name="title_rename_album">Rename this album</string>
     <string name="dialog_album_rename_failed">Error renaming</string>
@@ -82,5 +82,6 @@
     <string name="album_renamed_notify">Album renamed to %1$s</string>
     <string name="ops_applier_backing_up">Creating back up of %1$s to  %2$s…</string>
     <string name="ops_applier_back_up_done">Done!</string>
+    <string name="ops_applier_back_up_failed">Backing up failed</string>
 
 </resources>
