@@ -72,5 +72,13 @@
 
         More info? Go to https://github.com/nicolasbrailo/TrippingSdCardPhotoManager
     </string>
+    <string name="menu_create_back_up">Back up album</string>
+    <string name="alert_confirm_backup_title">Back up</string>
+    <string name="alert_confirm_backup_msg">Will copy all the pictures to a local storage in your device. This may take a long time.</string>
+    <string name="menu_rename_album">Rename this album</string>
+    <string name="title_rename_album">Rename this album</string>
+    <string name="dialog_album_rename_failed">Error renaming</string>
+    <string name="dialog_album_rename_failed_msg">Renaming this album failed. Are you sure you have permissions to do so?</string>
+    <string name="album_renamed_notify">Album renamed to %1$s</string>
 
 </resources>

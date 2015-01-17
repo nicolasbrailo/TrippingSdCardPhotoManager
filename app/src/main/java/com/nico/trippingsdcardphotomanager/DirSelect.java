@@ -18,7 +18,7 @@ import java.util.List;
 
 public class DirSelect extends Activity {
 
-    private static final String PREFERENCES_LAST_USED_DIR = "lastUsedDir";
+    public static final String PREFERENCES_LAST_USED_DIR = "lastUsedDir";
 
     private String currentPath = "/";
     private List<String> displayDirList = new ArrayList<>();

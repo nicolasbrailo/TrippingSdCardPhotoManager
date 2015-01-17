@@ -4,8 +4,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.text.SpannableString;
@@ -34,7 +38,11 @@ public class PhotoActionsFragment extends Fragment
         void switchToReviewMode();
         void switchToAlbumMode();
         boolean isReviewModeEnabled();
+        void startBackUp();
+        void renameAlbumTo(String s);
     }
+
+    private final String FIRST_TIME_HELP_SHOWN = "firstTimeHelpShown";
 
     private Activity activity;
     private AlbumContainer albumHolder;
@@ -64,6 +72,14 @@ public class PhotoActionsFragment extends Fragment
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement PhotoActionsFragment.Callback");
+        }
+
+        if (activity.getPreferences(0).getString(FIRST_TIME_HELP_SHOWN, "No").equals("No")) {
+            showHelpDialog(R.string.album_mode_help_msg);
+
+            SharedPreferences.Editor cfg = activity.getPreferences(0).edit();
+            cfg.putString(FIRST_TIME_HELP_SHOWN, "Yes");
+            cfg.apply();
         }
     }
 
@@ -156,6 +172,14 @@ public class PhotoActionsFragment extends Fragment
                 startActivity(new Intent(activity, DirSelect.class));
                 return true;
 
+            case R.id.menu_rename_album:
+                renameAlbum();
+                return true;
+
+            case R.id.menu_create_back_up:
+                createBackUp();
+                return true;
+
             case R.id.menu_help:
                 showHelpDialog(R.string.album_mode_help_msg);
                 return true;
@@ -176,6 +200,46 @@ public class PhotoActionsFragment extends Fragment
             default:
                 return false;
         }
+    }
+
+    private void renameAlbum() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(getString(R.string.title_rename_album));
+        final EditText input = new EditText(activity);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setText(albumHolder.getAlbum().getAlbumName());
+        builder.setView(input);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                cb.renameAlbumTo(input.getText().toString());
+            }
+        });
+
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void createBackUp() {
+        new AlertDialog.Builder(activity)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setTitle(R.string.alert_confirm_backup_title)
+                .setMessage(R.string.alert_confirm_backup_msg)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        cb.startBackUp();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private void popupGotoPicture() {

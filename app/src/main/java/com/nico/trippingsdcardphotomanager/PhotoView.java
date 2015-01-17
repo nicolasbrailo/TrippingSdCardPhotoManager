@@ -1,6 +1,8 @@
 package com.nico.trippingsdcardphotomanager;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GestureDetectorCompat;
 import android.os.Bundle;
@@ -162,6 +164,48 @@ public class PhotoView extends FragmentActivity implements
 
         // Trigger a new cache warm-up at the new position
         photoViewer.warmUpCache();
+    }
+
+    @Override
+    public void startBackUp() {
+        Log.i(PhotoView.class.getName(), "Starting activity to back up photos.");
+        /* TODO
+        Intent intent = new Intent(this, BackUpActivity.class);
+        intent.putExtra(BackUpActivity.ACTIVITY_PARAM_PATH, album.getPath());
+        startActivity(intent);
+        */
+    }
+
+    @Override
+    public void renameAlbumTo(final String name) {
+        Log.i(PhotoView.class.getName(), "Renaming album " + album.getPath() + " to " + name);
+        if (!album.renameTo(name)) {
+            Log.i(PhotoView.class.getName(), "Couldn't rename album");
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(R.string.dialog_album_rename_failed)
+                    .setMessage(R.string.dialog_album_rename_failed_msg)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+        } else {
+            Log.i(PhotoView.class.getName(), "Reloading album");
+            // Update the preferences
+            // TODO: This doesn't seem to be working
+            SharedPreferences.Editor cfg = getPreferences(0).edit();
+            cfg.putString(DirSelect.PREFERENCES_LAST_USED_DIR, album.getPath());
+            cfg.apply();
+            // Terminate current activity
+            finish();
+            // Restart self
+            Intent intent = new Intent(this, this.getClass());
+            intent.putExtra(PhotoView.ACTIVITY_PARAM_SELECTED_PATH, album.getPath());
+            startActivity(intent);
+            // Notify the user
+            final String msg = getResources().getString(R.string.album_renamed_notify);
+            final String formattedMsg = String.format(msg, album.getPath());
+            Toast toast = Toast.makeText(getApplicationContext(), formattedMsg, Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     /**********************************************************************************************/

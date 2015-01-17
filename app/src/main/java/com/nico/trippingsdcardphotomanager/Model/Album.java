@@ -126,4 +126,26 @@ public class Album implements Parcelable, Iterable<Picture> {
             return new Album[size];
         }
     };
+
+    public String getAlbumName() {
+        return path.substring(path.lastIndexOf('/')+1);
+    }
+
+    /**
+     * Rename this album: move the underlying directory to a new one. The current album
+     * becomes invalidated if the rename succeeds
+     * @param name
+     * @return
+     */
+    public boolean renameTo(String name) {
+        final String newName = path.substring(0, path.lastIndexOf('/')+1) + name;
+        final File newFile = new File(newName);
+        File dp = new File(path);
+        boolean ok = dp.renameTo(newFile);
+        if (ok) {
+            this.pics = null;
+            this.path = newName;
+        }
+        return ok;
+    }
 }

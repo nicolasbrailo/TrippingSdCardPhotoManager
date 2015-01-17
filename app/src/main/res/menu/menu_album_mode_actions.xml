@@ -11,6 +11,12 @@
     <item android:id="@+id/menu_choose_another_album"
         android:title="@string/menu_choose_different_path" />
 
+    <item android:id="@+id/menu_create_back_up"
+        android:title="@string/menu_create_back_up" />
+
+    <item android:id="@+id/menu_rename_album"
+        android:title="@string/menu_rename_album" />
+
     <item android:id="@+id/menu_help"
         android:title="@string/menu_help" />
 
