@@ -14,6 +14,7 @@ import com.nico.trippingsdcardphotomanager.Services.PendingOpsApplier;
 
 public class PendingOpsApplierActivity extends Activity implements PendingOpsApplier.Callback {
     public static final String ACTIVITY_PARAM_ALBUM = "com.nico.trippingsdcardphotomanager.ALBUM";
+    public static final String ACTIVITY_PARAM_OPS_FILTER = "com.nico.trippingsdcardphotomanager.OPS_FILTER";
 
     private PendingOpsApplier opApplier;
     private Album album;
@@ -25,10 +26,19 @@ public class PendingOpsApplierActivity extends Activity implements PendingOpsApp
 
         Log.i(PendingOpsApplierActivity.class.getName(), "Starting activity");
         album = getIntent().getParcelableExtra(ACTIVITY_PARAM_ALBUM);
+
+        PendingOpsApplier.OpsFilter opsFilter = PendingOpsApplier.OpsFilter.NoFilter;
+        final Integer filterCode = getIntent().getIntExtra(ACTIVITY_PARAM_OPS_FILTER, PendingOpsApplier.OpsFilter.NoFilter.value);
+        if (filterCode != null) {
+            if (filterCode < PendingOpsApplier.OpsFilter.values().length) {
+                opsFilter = PendingOpsApplier.OpsFilter.values()[filterCode];
+            }
+        }
+
         TextView x = (TextView) findViewById(R.id.wOpsApplier_Log);
         x.append(getString(R.string.ops_applier_about_to_start) + album.getPath() + "\n\n");
 
-        opApplier = new PendingOpsApplier(this, album);
+        opApplier = new PendingOpsApplier(this, album, opsFilter);
         opApplier.execute();
     }
 

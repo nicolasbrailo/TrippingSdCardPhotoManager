@@ -13,6 +13,7 @@ public class NonDisplayablePicture extends Picture implements Parcelable {
     public NonDisplayablePicture(Parcel in) {
         super(in.readString(), in.readString());
         setDeletionFlag(in.readInt() != 0);
+        setBackupFlag(in.readInt() != 0);
         setCompressionLevel(in.readInt());
     }
 

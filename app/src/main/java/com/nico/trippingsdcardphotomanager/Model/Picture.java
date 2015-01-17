@@ -12,6 +12,7 @@ public class Picture implements Parcelable {
     private final String path;
     private final String fname;
     private boolean markedForDeletion = false;
+    private boolean markedForBackup = false;
     private int compressionLevel = 0;
 
     public Picture(LruCache<String, ScaledDownPicture> pictureCache, final String path, final String fname) {
@@ -93,8 +94,24 @@ public class Picture implements Parcelable {
         return !noCompress;
     }
 
+    protected void setBackupFlag(boolean flag) {
+        this.markedForBackup = flag;
+    }
+
+    public void unmarkForBackup() {
+        this.markedForBackup = false;
+    }
+
+    public void markForBackup() {
+        this.markedForBackup = true;
+    }
+
+    public boolean isMarkedForBackup() {
+        return markedForBackup;
+    }
+
     boolean hasPendingOperation() {
-        return (isMarkedForCompression() || isMarkedForDeletion());
+        return (isMarkedForCompression() || isMarkedForBackup() || isMarkedForDeletion());
     }
 
 
@@ -114,6 +131,7 @@ public class Picture implements Parcelable {
         dest.writeString(path);
         dest.writeString(fname);
         dest.writeInt(markedForDeletion ? 1 : 0);
+        dest.writeInt(markedForBackup ? 1 : 0);
         dest.writeInt(compressionLevel);
     }
 }

@@ -80,5 +80,7 @@
     <string name="dialog_album_rename_failed">Error renaming</string>
     <string name="dialog_album_rename_failed_msg">Renaming this album failed. Are you sure you have permissions to do so?</string>
     <string name="album_renamed_notify">Album renamed to %1$s</string>
+    <string name="ops_applier_backing_up">Creating back up of %1$s to  %2$s…</string>
+    <string name="ops_applier_back_up_done">Done!</string>
 
 </resources>

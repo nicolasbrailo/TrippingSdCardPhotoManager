@@ -12,6 +12,16 @@ import java.io.File;
 
 public class PendingOpsApplier extends AsyncTask<Void, Integer, Void> {
 
+    public enum OpsFilter {
+        NoFilter(0),
+        OnlyBackups(1);
+
+        public final int value;
+        OpsFilter(int value) {
+            this.value = value;
+        }
+    }
+
     public interface Callback {
         public void onComplete();
         public void onProgressReport(int pct);
@@ -21,10 +31,12 @@ public class PendingOpsApplier extends AsyncTask<Void, Integer, Void> {
 
     private final Callback cb;
     private final Album album;
+    private final OpsFilter filter;
 
-    public PendingOpsApplier(final Callback cb, final Album album) {
+    public PendingOpsApplier(final Callback cb, final Album album, final OpsFilter filter) {
         this.cb = cb;
         this.album = album;
+        this.filter = filter;
     }
 
     @Override
@@ -36,10 +48,25 @@ public class PendingOpsApplier extends AsyncTask<Void, Integer, Void> {
             if (isCancelled()) break;
             publishProgress((int) ((100.0*processedCount)/album.getSize()));
 
-            if (pic.isMarkedForDeletion()) {
-                doDelete(pic);
-            } else if (pic.isMarkedForCompression()) {
-                doCompress(pic);
+            switch (filter) {
+                case NoFilter:
+                    if (pic.isMarkedForBackup()) {
+                        doBackup(pic);
+                    } else if (pic.isMarkedForDeletion()) {
+                        doDelete(pic);
+                    } else if (pic.isMarkedForCompression()) {
+                        doCompress(pic);
+                    }
+
+                    break;
+                case OnlyBackups:
+                    if (pic.isMarkedForBackup()) {
+                        doBackup(pic);
+                    }
+
+                    break;
+                default:
+                    throw new AssertionError("Shouldn't happen");
             }
 
             ++processedCount;
@@ -56,6 +83,18 @@ public class PendingOpsApplier extends AsyncTask<Void, Integer, Void> {
     @Override
     protected void onPostExecute(Void v) {
         cb.onComplete();
+    }
+
+    private void doBackup(Picture pic) {
+        String msg = String.format(cb.getString(R.string.ops_applier_backing_up),
+                pic.getFileName(), "/dev/null");
+        Log.i(PendingOpsApplier.class.getName(), msg);
+        cb.addToLog(msg);
+
+        // TODO
+
+        Log.i(PendingOpsApplier.class.getName(), cb.getString(R.string.ops_applier_back_up_done));
+        cb.addToLog(cb.getString(R.string.ops_applier_back_up_done));
     }
 
     private void doDelete(Picture pic) {

@@ -16,6 +16,8 @@ import android.widget.Toast;
 import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.AlbumContainer;
 import com.nico.trippingsdcardphotomanager.Model.PhotoViewerFilter;
+import com.nico.trippingsdcardphotomanager.Model.Picture;
+import com.nico.trippingsdcardphotomanager.Services.PendingOpsApplier;
 
 public class PhotoView extends FragmentActivity implements
                         GestureDetector.OnGestureListener,
@@ -169,11 +171,15 @@ public class PhotoView extends FragmentActivity implements
     @Override
     public void startBackUp() {
         Log.i(PhotoView.class.getName(), "Starting activity to back up photos.");
-        /* TODO
-        Intent intent = new Intent(this, BackUpActivity.class);
-        intent.putExtra(BackUpActivity.ACTIVITY_PARAM_PATH, album.getPath());
+        for (Picture pic : album) {
+            pic.markForBackup();
+        }
+
+        // Reuse the pending ops applier for backups
+        Intent intent = new Intent(this, PendingOpsApplierActivity.class);
+        intent.putExtra(PendingOpsApplierActivity.ACTIVITY_PARAM_ALBUM, album);
+        intent.putExtra(PendingOpsApplierActivity.ACTIVITY_PARAM_OPS_FILTER, PendingOpsApplier.OpsFilter.OnlyBackups.value);
         startActivity(intent);
-        */
     }
 
     @Override
