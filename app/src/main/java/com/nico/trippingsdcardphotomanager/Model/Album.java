@@ -6,6 +6,7 @@ import android.util.LruCache;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -58,6 +59,8 @@ public class Album implements Parcelable, Iterable<Picture> {
             if (!isPicture(fp)) continue;
             pics.add(new Picture(pictureCache, path, fp.getName()));
         }
+
+        Collections.sort(pics, new Picture.Comparator());
 
         return pics;
     }
@@ -134,8 +137,6 @@ public class Album implements Parcelable, Iterable<Picture> {
     /**
      * Rename this album: move the underlying directory to a new one. The current album
      * becomes invalidated if the rename succeeds
-     * @param name
-     * @return
      */
     public boolean renameTo(String name) {
         final String newName = path.substring(0, path.lastIndexOf('/')+1) + name;

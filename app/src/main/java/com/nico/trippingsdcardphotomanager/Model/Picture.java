@@ -35,7 +35,14 @@ public class Picture implements Parcelable {
         this.pictureCache = null;
     }
 
-        public String getFullPath() {
+    public static class Comparator implements java.util.Comparator<Picture> {
+        @Override
+        public int compare(Picture o1, Picture o2) {
+            return o1.getFileName().compareTo(o2.getFileName());
+        }
+    }
+
+    public String getFullPath() {
         return path;
     }
 
