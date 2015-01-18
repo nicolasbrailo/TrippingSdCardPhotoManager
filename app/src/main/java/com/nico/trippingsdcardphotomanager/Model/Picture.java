@@ -5,6 +5,8 @@ import android.os.Parcelable;
 import android.util.LruCache;
 import android.view.WindowManager;
 
+import com.nico.trippingsdcardphotomanager.PictureMogrifier.PictureMogrifier;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -113,12 +115,9 @@ public class Picture implements Parcelable {
     }
 
     public boolean backupToDevice() {
-        InputStream in = null;
-        OutputStream out = null;
-
         try {
-            in = new FileInputStream(this.path);
-            out = new FileOutputStream(this.backupPath + this.getFileName());
+            InputStream in = new FileInputStream(this.path);
+            OutputStream out = new FileOutputStream(this.backupPath + this.getFileName());
 
             byte[] buf = new byte[1024];
             int len;
@@ -159,5 +158,23 @@ public class Picture implements Parcelable {
         dest.writeString(backupPath);
         dest.writeInt(markedForDeletion ? 1 : 0);
         dest.writeInt(compressionLevel);
+    }
+
+    public int doCompress() {
+        // convert -quality 42 pic.jpg pic.jpg.compressed
+        final String fNameTmp = getFullPath() + ".compressed";
+        String argv[] = {"-quality", String.valueOf(getCompressionLevel()),
+                         getFullPath(), fNameTmp };
+
+        int ret = PictureMogrifier.mogrify(argv);
+
+        File fp = new File(fNameTmp);
+        if (fp.exists()) {
+            File fOld = new File(getFullPath());
+            fOld.delete();
+            final boolean b = fp.renameTo(fOld);
+        }
+
+        return ret;
     }
 }

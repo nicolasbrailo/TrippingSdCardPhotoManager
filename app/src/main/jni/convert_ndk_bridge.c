@@ -70,22 +70,25 @@ Java_com_nico_trippingsdcardphotomanager_PictureMogrifier_PictureMogrifier_mogri
     while (x) ;
     */
 
-    // This stuff was copypasted from Image magick's mogrify.c and
-    // transmogrified to work with Android. Lol, pun.
-    ExceptionInfo *exception;
-    ImageInfo *image_info;
-    MagickBooleanType status;
+    // This stuff was copypasted from Image magick's convert.c and
+    // transmogrified to work with Android.
+      ExceptionInfo
+        *exception;
 
-    MagickCoreGenesis(*argv, MagickTrue);
-    exception = AcquireExceptionInfo();
-    image_info = AcquireImageInfo();
+      ImageInfo
+        *image_info;
 
-    status = MagickCommandGenesis(image_info, MogrifyImageCommand,
-                                  argc, argv,(char **) NULL, exception);
+      MagickBooleanType
+        status;
 
-    image_info = DestroyImageInfo(image_info);
-    exception = DestroyExceptionInfo(exception);
-    MagickCoreTerminus();
+      MagickCoreGenesis(*argv,MagickTrue);
+      exception=AcquireExceptionInfo();
+      image_info=AcquireImageInfo();
+      status=MagickCommandGenesis(image_info,ConvertImageCommand,argc,argv,
+        (char **) NULL,exception);
+      image_info=DestroyImageInfo(image_info);
+      exception=DestroyExceptionInfo(exception);
+      MagickCoreTerminus();
 
     return(status != MagickFalse ? 0 : 1);
 }

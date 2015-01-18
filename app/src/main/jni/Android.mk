@@ -229,7 +229,7 @@ IMAGE_MAGICK_OBJS := \
 			ImageMagick/wand/composite.c          \
 			ImageMagick/wand/deprecate.c          \
 			ImageMagick/wand/wand.c               \
-			ImageMagick/wand/mogrify.c            \
+            ImageMagick/wand/mogrify.c            \
 			ImageMagick/wand/magick-image.c       \
 			ImageMagick/wand/magick-wand.c        \
 			ImageMagick/magick/client.c           \
@@ -331,7 +331,7 @@ IMAGE_MAGICK_OBJS := \
 
 
 LOCAL_SRC_FILES := \
-			mogrify_ndk_bridge.c \
+			convert_ndk_bridge.c \
 			$(JPEG_OBJS)		 \
 			$(IMAGE_MAGICK_OBJS) \
 

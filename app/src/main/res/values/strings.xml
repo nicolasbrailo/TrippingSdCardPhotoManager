@@ -83,5 +83,6 @@
     <string name="ops_applier_backing_up">Creating back up of %1$s to  %2$s…</string>
     <string name="ops_applier_back_up_done">Done!</string>
     <string name="ops_applier_back_up_failed">Backing up failed</string>
+    <string name="ops_applier_back_up_dir_create_fail">Couldn\'t create backup directory %1$s, backup may fail</string>
 
 </resources>

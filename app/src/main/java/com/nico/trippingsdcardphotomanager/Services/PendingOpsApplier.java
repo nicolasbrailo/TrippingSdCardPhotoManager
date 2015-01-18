@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.nico.trippingsdcardphotomanager.Model.Album;
 import com.nico.trippingsdcardphotomanager.Model.Picture;
-import com.nico.trippingsdcardphotomanager.PictureMogrifier.PictureMogrifier;
 import com.nico.trippingsdcardphotomanager.R;
 
 import java.io.File;
@@ -92,10 +91,17 @@ public class PendingOpsApplier extends AsyncTask<Void, Integer, Void> {
         Log.i(PendingOpsApplier.class.getName(), msg);
         cb.addToLog(msg);
 
-        // This assumes all the pics will be backed up to the same place
+        // This assumes all the pics will be backed up to the same place, which for now is true
         if (!backupDirCreated) {
             File fp = new File(pic.getBackupPath());
-            if (!fp.exists()) fp.mkdir();
+            if (!fp.exists()) {
+                if (!fp.mkdir()) {
+                    String msg2 = String.format(cb.getString(R.string.ops_applier_back_up_dir_create_fail),
+                                                pic.getBackupPath());
+                    Log.i(PendingOpsApplier.class.getName(), msg2);
+                    cb.addToLog(msg2);
+                }
+            }
             backupDirCreated = true;
         }
 
@@ -130,9 +136,7 @@ public class PendingOpsApplier extends AsyncTask<Void, Integer, Void> {
         Log.i(PendingOpsApplier.class.getName(), msg);
         cb.addToLog(msg);
 
-        String argv[] = {"-quality", String.valueOf(pic.getCompressionLevel()),
-                         pic.getFullPath()};
-        int ret = PictureMogrifier.mogrify(argv);
+        int ret = pic.doCompress();
         Log.i(PendingOpsApplier.class.getName(), "\tCompressed " + pic.getFullPath() + " = " + ret);
 
         String msg2;
