@@ -38,23 +38,23 @@
     <string name="ops_applier_removed_file">"Removed %1$s"</string>
     <string name="ops_applier_error_removing_file">"Error removing %1$s"</string>
     <string name="ops_applier_start_file_compress">"Compressing %1$s (%2$.2f MB) [May take a while]"</string>
-    <string name="ops_applier_done_file_compress">"Done, compressed %1$s to %2$.2f MB"</string>
-    <string name="ops_applier_error_compressing_file">"Error compressing %1$s (ret=%1$d)"</string>
+    <string name="ops_applier_file_compress_done">"Done, compressed %1$s to %2$.2f MB"</string>
+    <string name="ops_applier_error_compressing_file">"Error compressing %1$s (ret=%2$d)"</string>
     <string name="menu_help">Help</string>
     <string name="menu_review_mode_help">Help</string>
     <string name="help_dialog_title">Help</string>
     <string name="album_mode_help_msg">
         Welcome to Tripping Photo Manager - https://github.com/nicolasbrailo/TrippingSdCardPhotoManager\n\n
 
-        Review your pictures by swiping. If there is a picture you don\'t like mark it for deletion
-        using the action bar above. It won\'t be deleted until you confirm.\n\n
+        * Review your pictures by swiping.\n
+        * Use the bar above to mark pictures for deletion. It won\'t be deleted until you confirm.\n
+        * You can also mark pictures to be compressed.\n
+        * When done reviewing, apply all operations at once: select  \"Review and apply changes…\"
+        from the action bar.\n
+        * Once in review mode, you can review all the pending operations.\n
+        * When ready, go once more to the menu and select the option \"Apply all pending changes\".\n\n
 
-        When you are done, delete all the unwanted pictures at once: select the option
-        \"Review and apply changes…\" from the action bar. Once in review mode, you can review the
-        pending operations. When ready, go once more to the menu and select the option
-        \"Apply all pending changes\".\n\n
-
-        Tripping Photo Manager can also compress photos. Using a 90% compression usually results
+        Tripping Photo Manager can compress photos using ImageMagick. Using a 90% compression usually results
         in no visible quality difference, even at 100% zoom. Mark the pictures you want to compress
         with the button in the action bar.\n\n
 
@@ -84,5 +84,7 @@
     <string name="ops_applier_back_up_done">Done!</string>
     <string name="ops_applier_back_up_failed">Backing up failed</string>
     <string name="ops_applier_back_up_dir_create_fail">Couldn\'t create backup directory %1$s, backup may fail</string>
+    <string name="ops_applier_file_compress_cant_remove">Couldn\'t remove uncompressed file: both the compressed and uncompressed images will be available</string>
+    <string name="ops_applier_file_compress_cant_rename">Couldn\'t rename compressed file, please rename it manually</string>
 
 </resources>

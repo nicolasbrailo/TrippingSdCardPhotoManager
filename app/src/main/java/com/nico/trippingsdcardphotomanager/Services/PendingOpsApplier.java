@@ -130,26 +130,32 @@ public class PendingOpsApplier extends AsyncTask<Void, Integer, Void> {
     }
 
     private void doCompress(Picture pic) {
-        String msg = String.format(cb.getString(R.string.ops_applier_start_file_compress),
-                pic.getFileName(),
-                pic.getFileSizeInMb());
+        final String msg = String.format(cb.getString(R.string.ops_applier_start_file_compress),
+                                    pic.getFileName(),
+                                    pic.getFileSizeInMb());
         Log.i(PendingOpsApplier.class.getName(), msg);
         cb.addToLog(msg);
 
-        int ret = pic.doCompress();
-        Log.i(PendingOpsApplier.class.getName(), "\tCompressed " + pic.getFullPath() + " = " + ret);
-
-        String msg2;
-        if (ret == 0) {
-            msg2 = String.format(cb.getString(R.string.ops_applier_done_file_compress),
+        String opResult;
+        try {
+            pic.doCompress();
+            opResult = String.format(cb.getString(R.string.ops_applier_file_compress_done),
+                                    pic.getFileName(),
+                                    pic.getFileSizeInMb());
+        } catch (Picture.CompressionFailed ex) {
+            opResult = String.format(cb.getString(R.string.ops_applier_error_compressing_file),
                     pic.getFileName(),
-                    pic.getFileSizeInMb());
-        } else {
-            msg2 = String.format(cb.getString(R.string.ops_applier_error_compressing_file),
+                    ex.getRetVal());
+        } catch (Picture.CantRemoveUncompressedFile ex) {
+            opResult = String.format(cb.getString(R.string.ops_applier_file_compress_cant_remove),
+                    pic.getFileName());
+        } catch (Picture.CantRenameCompressedFile ex) {
+            opResult = String.format(cb.getString(R.string.ops_applier_file_compress_cant_rename),
                     pic.getFileName());
         }
-        Log.i(PendingOpsApplier.class.getName(), msg2);
-        cb.addToLog(msg2);
+
+        Log.i(PendingOpsApplier.class.getName(), opResult);
+        cb.addToLog(opResult);
     }
 
 }

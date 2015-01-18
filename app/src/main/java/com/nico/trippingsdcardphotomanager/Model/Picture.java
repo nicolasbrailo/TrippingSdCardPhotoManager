@@ -160,7 +160,8 @@ public class Picture implements Parcelable {
         dest.writeInt(compressionLevel);
     }
 
-    public int doCompress() {
+    public int doCompress()
+            throws CompressionFailed, CantRemoveUncompressedFile, CantRenameCompressedFile {
         // convert -quality 42 pic.jpg pic.jpg.compressed
         final String fNameTmp = getFullPath() + ".compressed";
         String argv[] = {"-quality", String.valueOf(getCompressionLevel()),
@@ -168,13 +169,32 @@ public class Picture implements Parcelable {
 
         int ret = PictureMogrifier.mogrify(argv);
 
+        // Verify if the compressed file exists
         File fp = new File(fNameTmp);
-        if (fp.exists()) {
-            File fOld = new File(getFullPath());
-            fOld.delete();
-            final boolean b = fp.renameTo(fOld);
-        }
+        if (!fp.exists()) throw new CompressionFailed(ret);
+
+        // Remove the old (uncompressed) file
+        File fOld = new File(getFullPath());
+        if (!fOld.delete()) throw new CantRemoveUncompressedFile();
+
+        // After the old file was removed, rename the compressed file
+        if (!fp.renameTo(fOld)) throw new CantRenameCompressedFile();
 
         return ret;
     }
+
+    public static class CompressionFailed extends Throwable {
+        private final int ret;
+
+        CompressionFailed(final int ret) {
+            this.ret = ret;
+        }
+
+        public final int getRetVal() {
+            return ret;
+        }
+    }
+
+    public static class CantRemoveUncompressedFile extends Throwable {}
+    public static class CantRenameCompressedFile extends Throwable {}
 }
