@@ -166,6 +166,8 @@ public class PhotoActionsFragment extends Fragment
                 return true;
 
             case R.id.menu_choose_another_album:
+                // Clean the cached thumbnails for the current activity
+                albumHolder.getAlbum().cleanCache();
                 startActivity(new Intent(activity, DirSelect.class));
                 return true;
 

@@ -149,4 +149,8 @@ public class Album implements Parcelable, Iterable<Picture> {
         }
         return ok;
     }
+
+    public void cleanCache() {
+        pictureCache.evictAll();
+    }
 }
