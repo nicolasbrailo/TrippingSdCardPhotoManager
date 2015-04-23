@@ -1,6 +1,7 @@
 package com.nico.trippingsdcardphotomanager.Services;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.nico.trippingsdcardphotomanager.Model.Picture;
@@ -20,7 +21,19 @@ public class PictureResizer extends AsyncTask<Picture, Void, ScaledDownPicture> 
     @Override
     protected ScaledDownPicture doInBackground(Picture... params) {
         Picture pic = params[0];
-        return pic.scaleDownPicture(windowManager);
+        try {
+            return pic.scaleDownPicture(windowManager);
+        } catch (ScaledDownPicture.TemporaryError ex) {
+            Log.e(PictureResizer.class.getName(), "Error while creating thumbnail: " + ex.getMessage() + ". Will try cleaning the cache.");
+            pic.clearCache();
+        }
+
+        try {
+            return pic.scaleDownPicture(windowManager);
+        } catch (ScaledDownPicture.TemporaryError ex) {
+            Log.e(PictureResizer.class.getName(), "Second rendering failed, giving up: " + ex.getMessage());
+            return new ScaledDownPicture.Invalid(pic);
+        }
     }
 
     @Override

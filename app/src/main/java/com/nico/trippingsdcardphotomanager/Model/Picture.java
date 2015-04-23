@@ -64,13 +64,17 @@ public class Picture implements Parcelable {
 
     protected void setCompressionLevel(int compressionLevel) { this.compressionLevel = compressionLevel; }
 
+    public void clearCache() {
+        pictureCache.evictAll();
+    }
+
     public ScaledDownPicture getDisplayImage() {
         ScaledDownPicture pic = pictureCache.get(fname);
         if (pic == null) throw new AssertionError("Programmer sucks error: called getDisplayImage on a non-cached picture");
         return pic;
     }
 
-    public ScaledDownPicture scaleDownPicture(WindowManager windowManager) {
+    public ScaledDownPicture scaleDownPicture(WindowManager windowManager) throws ScaledDownPicture.TemporaryError {
         // If we were cached while waiting to be loaded, just use the cache
         if (!needsResizing()) return getDisplayImage();
 

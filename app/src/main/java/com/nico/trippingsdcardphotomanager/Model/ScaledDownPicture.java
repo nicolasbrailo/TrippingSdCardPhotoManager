@@ -14,7 +14,19 @@ public class ScaledDownPicture {
     private final Picture picture;
     private final boolean isAValidPicture;
 
-    ScaledDownPicture(WindowManager windowManager, Picture pic, String path) {
+    public static class Invalid extends ScaledDownPicture {
+        public Invalid(final Picture pic) {
+            super(pic);
+        }
+    }
+
+    protected ScaledDownPicture(final Picture pic) {
+        picture = pic;
+        scaledPicture = null;
+        isAValidPicture = false;
+    }
+
+    ScaledDownPicture(final WindowManager windowManager, final Picture pic, final String path) throws TemporaryError {
         this.picture = pic;
 
         File fp = new File(path);
@@ -28,9 +40,18 @@ public class ScaledDownPicture {
         imgInfo.inSampleSize = calculateScaleDownFactor(windowManager, imgInfo);
         final Bitmap bm = BitmapFactory.decodeFile(fp.getAbsolutePath(), imgInfo);
 
+        final Bitmap tmpPic;
         if (bm != null) {
             int nh = (int) ( bm.getHeight() * (512.0 / bm.getWidth()) );
-            scaledPicture = Bitmap.createScaledBitmap(bm, 512, nh, false);
+            try {
+                tmpPic = Bitmap.createScaledBitmap(bm, 512, nh, false);
+            } catch (RuntimeException ex) {
+                isAValidPicture = false;
+                scaledPicture = null;
+                throw new TemporaryError(ex.getMessage());
+            }
+
+            scaledPicture = tmpPic;
             isAValidPicture = true;
         } else {
             isAValidPicture = false;
@@ -103,5 +124,11 @@ public class ScaledDownPicture {
         public String getMessage() {
             return "This file is not a valid image.";
         }
+    }
+
+    public static class TemporaryError extends Throwable {
+        private final String error;
+        public TemporaryError(final String error) { this.error = error; }
+        public String getMessage() { return error; }
     }
 }
